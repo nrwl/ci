@@ -1,0 +1,223 @@
+name: Nx Cloud Main
+
+on:
+  workflow_call:
+    inputs:
+      init-commands:
+        required: false
+        type: string
+      final-commands:
+        required: false
+        type: string
+      parallel-commands:
+        required: false
+        type: string
+      parallel-commands-on-agents:
+        required: false
+        type: string
+      node-version:
+        required: false
+        type: string
+      yarn-version:
+        required: false
+        type: string
+      npm-version:
+        required: false
+        type: string
+      install-command:
+        required: false
+        type: string
+      main-branch-name:
+        required: false
+        type: string
+        default: main
+
+env:
+  NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  NX_BRANCH: ${{ github.event.number || github.ref_name }}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    # The name of the job which will invoke this one is expected to be "Nx Cloud - Main Job", and whatever we call this will be appended
+    # to that one after a forward slash, so we keep this one intentionally short to produce "Nx Cloud - Main Job / Run" in the Github UI
+    name: Run
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout [Pull Request]
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          # By default, PRs will be checked-out based on the Merge Commit, but we want the actual branch HEAD.
+          ref: ${{ github.event.pull_request.head.sha }}
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
+          fetch-depth: 0
+
+      - uses: actions/checkout@v2
+        name: Checkout [Default Branch]
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
+          fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v2
+        with:
+          main-branch-name: ${{ inputs.main-branch-name }}
+
+      # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
+      - uses: volta-cli/action@fdf4cf319494429a105efaa71d0e5ec67f338c6e
+        with:
+          node-version: '${{ inputs.node-version }}'
+          npm-version: '${{ inputs.npm-version }}'
+          yarn-version: '${{ inputs.yarn-version }}'
+
+      - name: Print node/npm/yarn versions
+        id: print-versions
+        run: |
+          node --version
+          npm --version
+          yarn --version || true
+          echo "::set-output name=use_yarn::$([[ -f ./yarn.lock ]] && echo "true" || echo "false")"
+
+      - name: Get node version for cache key
+        id: cache-key
+        run: echo "::set-output name=node_version::$(node --version)"
+
+      - name: Use the node_modules cache if available [npm]
+        if: steps.print-versions.outputs.use_yarn != 'true'
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ steps.cache-key.outputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ steps.cache-key.outputs.node_version }}-
+
+      - name: Get yarn cache directory path
+        if: steps.print-versions.outputs.use_yarn == 'true'
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Use the node_modules cache if available [yarn]
+        if: steps.print-versions.outputs.use_yarn == 'true'
+        uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ steps.yarn-cache-dir-path.outputs.node_version }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ steps.yarn-cache-dir-path.outputs.node_version }}-yarn-
+
+      - name: Install dependencies
+        run: |
+          if [ -n "${{ inputs.install-command }}" ]; then
+            echo "Running custom install-command: ${{ inputs.install-command }}"
+            ${{ inputs.install-command }}
+          elif [ "${{ steps.print-versions.outputs.use_yarn }}" == "true" ]; then
+            echo "Running yarn install --frozen-lockfile"
+            yarn install --frozen-lockfile
+          else
+            echo "Running npm ci"
+            npm ci
+          fi
+
+      # An unfortunate side-effect of the way reusable workflows work is that by the time they are pulled into the "caller"
+      # repo, they are effectively completely embedded in that context. This means that we cannot reference any files which
+      # are local to this repo which defines the workflow, and we therefore need to work around this by embedding the contents
+      # of the shell utilities for executing commands into the workflow directly.
+      - name: Create command utils
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { writeFileSync } = require('fs');
+            const runCommandsInParallelScript = `
+              # Extract the provided commands from the stringified JSON array.
+              IFS=$'\n' read -d '' -a userCommands < <((jq -c -r '.[]') <<<"$1")
+
+              # Invoke the provided commands in parallel and collect their exit codes.
+              pids=()
+              for userCommand in "\${userCommands[@]}"; do
+                eval "$userCommand" & pids+=($!)
+              done
+
+              # If any one of the invoked commands exited with a non-zero exit code, exit the whole thing with code 1.
+              for pid in \${pids[*]}; do
+                if ! wait $pid; then
+                  exit 1
+                fi
+              done
+
+              # All the invoked commands must have exited with code zero.
+              exit 0
+            `;
+            writeFileSync('./.github/workflows/run-commands-in-parallel.sh', runCommandsInParallelScript);
+
+      - name: Prepare command utils
+        run: chmod +x ./.github/workflows/run-commands-in-parallel.sh
+
+      - name: Initialize the Nx Cloud distributed CI run
+        run: npx nx-cloud start-ci-run
+
+      # The good thing about the multi-line string input for sequential commands is that we can simply forward it on as is to the bash shell and it will behave
+      # how we want it to in terms of quote escaping, variable assignment etc
+      - name: Run any configured init-commands sequentially
+        if: ${{ inputs.init-commands != '' }}
+        shell: bash
+        run: |
+          ${{ inputs.init-commands }}
+
+      - name: Process parallel commands configuration
+        uses: actions/github-script@v6
+        id: parallel_commands_config
+        env:
+          PARALLEL_COMMANDS: ${{ inputs.parallel-commands }}
+          PARALLEL_COMMANDS_ON_AGENTS: ${{ inputs.parallel-commands-on-agents }}
+        with:
+          # For the ones configured for main, explicitly set NX_CLOUD_DISTRIBUTED_EXECUTION to false, taking into account commands chained with &&
+          # within the strings. In order to properly escape single quotes we need to do some manual replacing and escaping so that the commands
+          # are forwarded onto the run-commands-in-parallel.sh script appropriately.
+          script: |
+            const parallelCommandsOnMainStr = process.env.PARALLEL_COMMANDS || '';
+            const parallelCommandsOnAgentsStr = process.env.PARALLEL_COMMANDS_ON_AGENTS || '';
+
+            const parallelCommandsOnMain = parallelCommandsOnMainStr
+              .split('\n')
+              .map(command => command.trim())
+              .filter(command => command.length > 0)
+              .map(s => s.replace(/'/g, '%27'));
+            const parallelCommandsOnAgents = parallelCommandsOnAgentsStr
+              .split('\n')
+              .map(command => command.trim())
+              .filter(command => command.length > 0)
+              .map(s => s.replace(/'/g, '%27'));
+
+            const formattedArrayOfCommands = [
+              ...parallelCommandsOnMain.map(s => s
+                .split(' && ')
+                .map(s => `NX_CLOUD_DISTRIBUTED_EXECUTION=false ${s}`)
+                .join(' && ')
+              ),
+              ...parallelCommandsOnAgents,
+            ];
+
+            const stringifiedEncodedArrayOfCommands = JSON.stringify(formattedArrayOfCommands)
+              .replace(/%27/g, "'\\''");
+
+            return stringifiedEncodedArrayOfCommands
+          result-encoding: string
+
+      - name: Run any configured parallel commands on main and agent jobs
+        run: ./.github/workflows/run-commands-in-parallel.sh '${{ steps.parallel_commands_config.outputs.result }}'
+        shell: bash
+
+      # The good thing about the multi-line string input for sequential commands is that we can simply forward it on as is to the bash shell and it will behave
+      # how we want it to in terms of quote escaping, variable assignment etc
+      - name: Run any configured final-commands sequentially
+        if: ${{ inputs.final-commands != '' }}
+        shell: bash
+        run: |
+          ${{ inputs.final-commands }}
+
+      - name: Stop all running agents for this CI run
+        # It's important that we always run this step, otherwise in the case of any failures in preceding non-Nx steps, the agents will keep running and waste billable minutes
+        if: ${{ always() }}
+        run: npx nx-cloud stop-all-agents
