@@ -67,6 +67,11 @@ jobs:
         with:
           main-branch-name: ${{ inputs.main-branch-name }}
 
+      - name: Detect package manager
+        id: package_manager
+        run: |
+          echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || "npm")"
+
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
       - uses: volta-cli/action@fdf4cf319494429a105efaa71d0e5ec67f338c6e
         with:
@@ -76,6 +81,7 @@ jobs:
 
       # Install pnpm with exact version provided by consumer or fallback to latest
       - name: Install PNPM
+        if: steps.package_manager.outputs.name == 'pnpm'
         uses: pnpm/action-setup@v2.2.1
         with:
           version: ${{ inputs.pnpm-version || 'latest' }}
@@ -93,10 +99,9 @@ jobs:
           if [[ $pnpm_ver != '' ]]; then echo "PNPM: $pnpm_ver"; fi
 
           echo "::set-output name=node_version::${node_ver:1}"
-          echo "::set-output name=package_manager::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
       - name: Use the node_modules cache if available [npm]
-        if: steps.versions.outputs.package_manager == "npm"
+        if: steps.package_manager.outputs.name == 'npm'
         uses: actions/cache@v2
         with:
           path: ~/.npm
@@ -105,19 +110,21 @@ jobs:
             ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-
 
       - name: Use the node_modules cache if available [pnpm]
-        if: steps.versions.outputs.package_manager == "pnpm"
-        uses: actions/setup-node@v2
+        if: steps.package_manager.outputs.name == 'pnpm'
+        uses: actions/cache@v2
         with:
-          node-version: ${{ steps.versions.outputs.node_version }}
-          cache: "pnpm"
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-
 
       - name: Get yarn cache directory path
-        if: steps.versions.outputs.package_manager == "yarn"
+        if: steps.package_manager.outputs.name == 'yarn'
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Use the node_modules cache if available [yarn]
-        if: steps.versions.outputs.package_manager == "yarn"
+        if: steps.package_manager.outputs.name == 'yarn'
         uses: actions/cache@v2
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -130,10 +137,10 @@ jobs:
           if [ -n "${{ inputs.install-command }}" ]; then
             echo "Running custom install-command: ${{ inputs.install-command }}"
             ${{ inputs.install-command }}
-          elif [ "${{ steps.versions.outputs.package_manager == "yarn" }}" == "true" ]; then
+          elif [ "${{ steps.package_manager.outputs.name == 'yarn' }}" == "true" ]; then
             echo "Running yarn install --frozen-lockfile"
             yarn install --frozen-lockfile
-          elif [ "${{ steps.versions.outputs.package_manager == "pnpm" }}" == "true" ]; then
+          elif [ "${{ steps.package_manager.outputs.name == 'pnpm' }}" == "true" ]; then
             echo "Running pnpm install --frozen-lockfile"
             pnpm install --frozen-lockfile
           else

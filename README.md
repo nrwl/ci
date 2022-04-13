@@ -122,6 +122,7 @@ jobs:
 
     # [OPTIONAL] If you want to provide a specific pnpm version to use you can do that here.
     # If you do not specify one, it will install the latest version of pnpm available.
+    # Pnpm gets installed only if pnpm-lock.yaml is present in your repo.
     pnpm-version: ""
 
     # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
@@ -162,6 +163,7 @@ jobs:
 
     # [OPTIONAL] If you want to provide a specific pnpm version to use you can do that here.
     # If you do not specify one, it will install the latest version of pnpm available.
+    # Pnpm gets installed only if pnpm-lock.yaml is present in your repo.
     pnpm-version: ""
 
     # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
