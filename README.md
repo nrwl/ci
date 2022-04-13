@@ -42,7 +42,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.1
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.2
     with:
       parallel-commands: |
         npx nx workspace-lint
@@ -120,6 +120,10 @@ jobs:
     # your package.json, otherwise it will simply install the latest v1 version of yarn available.
     yarn-version: ""
 
+    # [OPTIONAL] If you want to provide a specific pnpm version to use you can do that here.
+    # If you do not specify one, it will install the latest version of pnpm available.
+    pnpm-version: ""
+
     # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
     # you can do that here. If you do not specify one, it will check for the presence of a yarn.lock
     # file in your repo, and if it finds one, run `yarn install --frozen-lockfile`. Otherwise it will
@@ -155,6 +159,10 @@ jobs:
     # If you do not specify one, it will respect an optional volta config you might have in
     # your package.json, otherwise it will simply install the latest v1 version of yarn available.
     yarn-version: ""
+
+    # [OPTIONAL] If you want to provide a specific pnpm version to use you can do that here.
+    # If you do not specify one, it will install the latest version of pnpm available.
+    pnpm-version: ""
 
     # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
     # you can do that here. If you do not specify one, it will check for the presence of a yarn.lock

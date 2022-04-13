@@ -15,6 +15,9 @@ on:
       npm-version:
         required: false
         type: string
+      pnpm-version:
+        required: false
+        type: string
       install-command:
         required: false
         type: string
@@ -55,21 +58,29 @@ jobs:
           npm-version: "${{ inputs.npm-version }}"
           yarn-version: "${{ inputs.yarn-version }}"
 
+      # Install pnpm with exact version provided by consumer or fallback to latest
+      - name: Install PNPM
+        uses: pnpm/action-setup@v2.2.1
+        with:
+          version: ${{ inputs.pnpm-version || 'latest' }}
+
       - name: Print node/npm/yarn versions
         id: versions
         run: |
           node_ver=$( node --version )
           yarn_ver=$( yarn --version || true )
+          pnpm_ver=$( pnpm --version || true )
 
           echo "Node: ${node_ver:1}"
           echo "NPM: $( npm --version )"
           if [[ $yarn_ver != '' ]]; then echo "Yarn: $yarn_ver"; fi
+          if [[ $pnpm_ver != '' ]]; then echo "PNPM: $pnpm_ver"; fi
 
           echo "::set-output name=node_version::${node_ver:1}"
-          echo "::set-output name=use_yarn::$([[ -f ./yarn.lock ]] && echo "true" || echo "false")"
+          echo "::set-output name=package_manager::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
       - name: Use the node_modules cache if available [npm]
-        if: steps.versions.outputs.use_yarn != 'true'
+        if: steps.versions.outputs.package_manager == "npm"
         uses: actions/cache@v2
         with:
           path: ~/.npm
@@ -77,15 +88,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-
 
+      - name: Use the node_modules cache if available [pnpm]
+        if: steps.versions.outputs.package_manager == "pnpm"
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.versions.outputs.node_version }}
+          cache: "pnpm"
+
       - name: Get yarn cache directory path
-        if: steps.versions.outputs.use_yarn == 'true'
+        if: steps.versions.outputs.package_manager == "yarn"
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Use the node_modules cache if available [yarn]
-        if: steps.versions.outputs.use_yarn == 'true'
+        if: steps.versions.outputs.package_manager == "yarn"
         uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -97,9 +114,12 @@ jobs:
           if [ -n "${{ inputs.install-command }}" ]; then
             echo "Running custom install-command: ${{ inputs.install-command }}"
             ${{ inputs.install-command }}
-          elif [ "${{ steps.versions.outputs.use_yarn }}" == "true" ]; then
+          elif [ "${{ steps.versions.outputs.package_manager == "yarn" }}" == "true" ]; then
             echo "Running yarn install --frozen-lockfile"
             yarn install --frozen-lockfile
+          elif [ "${{ steps.versions.outputs.package_manager == "pnpm" }}" == "true" ]; then
+            echo "Running pnpm install --frozen-lockfile"
+            pnpm install --frozen-lockfile
           else
             echo "Running npm ci"
             npm ci
