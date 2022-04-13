@@ -51,16 +51,16 @@ jobs:
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
       - uses: volta-cli/action@fdf4cf319494429a105efaa71d0e5ec67f338c6e
         with:
-          node-version: '${{ inputs.node-version }}'
-          npm-version: '${{ inputs.npm-version }}'
-          yarn-version: '${{ inputs.yarn-version }}'
+          node-version: "${{ inputs.node-version }}"
+          npm-version: "${{ inputs.npm-version }}"
+          yarn-version: "${{ inputs.yarn-version }}"
 
       - name: Print node/npm/yarn versions
         id: print-versions
         run: |
-          node --version
-          npm --version
-          yarn --version || true
+          echo "Node: $( node --version )"
+          echo "NPM: v$( npm --version )"
+          echo "Yarn: v$( yarn --version )" || true
           echo "::set-output name=use_yarn::$([[ -f ./yarn.lock ]] && echo "true" || echo "false")"
 
       - name: Get node version for cache key
