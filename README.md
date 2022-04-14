@@ -42,7 +42,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.1
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.2
     with:
       parallel-commands: |
         npx nx workspace-lint
@@ -54,7 +54,7 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.1
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.2
     with:
       number-of-agents: 3
 ```
@@ -66,7 +66,7 @@ jobs:
 <!-- start configuration-options-for-the-main-job -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.1
+- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.2
   with:
     # [OPTIONAL] A multi-line string representing any bash commands (separated by new lines) which should
     # run sequentially, directly on the main job BEFORE executing any of the parallel commands which
@@ -120,6 +120,11 @@ jobs:
     # your package.json, otherwise it will simply install the latest v1 version of yarn available.
     yarn-version: ""
 
+    # [OPTIONAL] If you want to provide a specific pnpm version to use you can do that here.
+    # If you do not specify one, it will install the latest version of pnpm available.
+    # Pnpm gets installed only if pnpm-lock.yaml is present in your repo.
+    pnpm-version: ""
+
     # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
     # you can do that here. If you do not specify one, it will check for the presence of a yarn.lock
     # file in your repo, and if it finds one, run `yarn install --frozen-lockfile`. Otherwise it will
@@ -134,7 +139,7 @@ jobs:
 <!-- start configuration-options-for-agent-jobs -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.1
+- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.2
   with:
     # [REQUIRED] The number of agents which should be created as part of the workflow in order to
     # allow Nx Cloud to intelligently distribute tasks in parallel.
@@ -155,6 +160,11 @@ jobs:
     # If you do not specify one, it will respect an optional volta config you might have in
     # your package.json, otherwise it will simply install the latest v1 version of yarn available.
     yarn-version: ""
+
+    # [OPTIONAL] If you want to provide a specific pnpm version to use you can do that here.
+    # If you do not specify one, it will install the latest version of pnpm available.
+    # Pnpm gets installed only if pnpm-lock.yaml is present in your repo.
+    pnpm-version: ""
 
     # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
     # you can do that here. If you do not specify one, it will check for the presence of a yarn.lock
