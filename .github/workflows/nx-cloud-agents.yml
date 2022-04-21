@@ -21,6 +21,9 @@ on:
       install-command:
         required: false
         type: string
+      init-commands:
+        required: false
+        type: string
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
@@ -131,6 +134,13 @@ jobs:
             echo "Running npm ci"
             npm ci
           fi
+      # The good thing about the multi-line string input for sequential commands is that we can simply forward it on as is to the bash shell and it will behave
+      # how we want it to in terms of quote escaping, variable assignment etc
+      - name: Run any configured init-commands sequentially
+        if: ${{ inputs.init-commands != '' }}
+        shell: bash
+        run: |
+          ${{ inputs.init-commands }}
 
       - name: Start Nx Agent ${{ matrix.agent }}
         run: npx nx-cloud start-agent
