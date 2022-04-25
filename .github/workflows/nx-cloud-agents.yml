@@ -142,3 +142,5 @@ jobs:
 
       - name: Start Nx Agent ${{ matrix.agent }}
         run: npx nx-cloud start-agent
+        env: 
+          NX_AGENT_NAME: ${{matrix.agent}}
