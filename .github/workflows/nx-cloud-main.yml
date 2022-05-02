@@ -76,7 +76,7 @@ jobs:
       - name: Detect package manager
         id: package_manager
         run: |
-          echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || "npm")"
+          echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
       - uses: volta-cli/action@fdf4cf319494429a105efaa71d0e5ec67f338c6e
@@ -186,7 +186,7 @@ jobs:
             writeFileSync('./.github/workflows/run-commands-in-parallel.sh', runCommandsInParallelScript);
 
       - name: Prepare command utils
-        run: chmod +x ./.github/workflows/run-commands-in-parallel.sh
+        run: chmod +x ${{ github.workspace }}/.github/workflows/run-commands-in-parallel.sh
 
       - name: Initialize the Nx Cloud distributed CI run
         run: npx nx-cloud start-ci-run
@@ -240,7 +240,7 @@ jobs:
           result-encoding: string
 
       - name: Run any configured parallel commands on main and agent jobs
-        run: ./.github/workflows/run-commands-in-parallel.sh '${{ steps.parallel_commands_config.outputs.result }}'
+        run: ${{ github.workspace }}/.github/workflows/run-commands-in-parallel.sh '${{ steps.parallel_commands_config.outputs.result }}'
         shell: bash
 
       # The good thing about the multi-line string input for sequential commands is that we can simply forward it on as is to the bash shell and it will behave
