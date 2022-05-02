@@ -21,6 +21,8 @@ on:
       install-command:
         required: false
         type: string
+      # We needed this input in order to be able to configure out integration tests for this repo, it is not documented
+      # so as to not cause confusion/add noise, but technically any consumer of the workflow can use it if they want to.
       working-directory:
         required: false
         type: string
