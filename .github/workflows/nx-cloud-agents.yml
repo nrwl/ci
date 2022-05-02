@@ -21,6 +21,13 @@ on:
       install-command:
         required: false
         type: string
+      working-directory:
+        required: false
+        type: string
+
+defaults:
+  run:
+    working-directory: ${{ inputs.working-directory || github.workspace }}
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true

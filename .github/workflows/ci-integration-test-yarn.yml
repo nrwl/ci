@@ -10,15 +10,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: ./integration-tests/yarn
-
 jobs:
   main:
     name: Nx Cloud - Main Job
     uses: ./.github/workflows/nx-cloud-main.yml
     with:
+      working-directory: ./integration-tests/yarn
       parallel-commands: |
         npx nx workspace-lint
         npx nx format:check
@@ -31,4 +28,5 @@ jobs:
     name: Nx Cloud - Agents
     uses: ./.github/workflows/nx-cloud-agents.yml
     with:
+      working-directory: ./integration-tests/yarn
       number-of-agents: 3
