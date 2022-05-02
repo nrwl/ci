@@ -56,7 +56,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.2
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.3
     with:
       parallel-commands: |
         npx nx workspace-lint
@@ -68,7 +68,7 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.2
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.3
     with:
       number-of-agents: 3
 ```
@@ -80,7 +80,7 @@ jobs:
 <!-- start configuration-options-for-the-main-job -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.2
+- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.3
   with:
     # [OPTIONAL] A multi-line string representing any bash commands (separated by new lines) which should
     # run sequentially, directly on the main job BEFORE executing any of the parallel commands which
@@ -153,7 +153,7 @@ jobs:
 <!-- start configuration-options-for-agent-jobs -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.2
+- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.3
   with:
     # [REQUIRED] The number of agents which should be created as part of the workflow in order to
     # allow Nx Cloud to intelligently distribute tasks in parallel.
