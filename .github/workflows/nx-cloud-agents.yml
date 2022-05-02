@@ -25,10 +25,6 @@ on:
         required: false
         type: string
 
-defaults:
-  run:
-    working-directory: ${{ inputs.working-directory || github.workspace }}
-
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
 
@@ -55,6 +51,9 @@ jobs:
       matrix:
         agent:
           - ${{fromJson(needs.set-agents.outputs.matrix)}}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory || github.workspace }}
     steps:
       - uses: actions/checkout@v2
 
