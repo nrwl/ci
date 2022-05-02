@@ -9,6 +9,20 @@ width="100%" alt="Nx - Smart, Extensible Build Framework"></p>
 - [Configuration Options for the Main Job](#configuration-options-for-the-main-job-nx-cloud-mainyml)
 - [Configuration Options for the Agent Jobs](#configuration-options-for-agent-jobs-nx-cloud-agentsyml)
 
+## Disclaimer: Github Workflow Limitations
+
+These workflows are intended to save folks time and complexity in getting up and running with Nx Cloud and Github Actions. They are _NOT_ intended to be a one-size-fits-all CI solution.
+
+They will scale to workspaces of essentially any size thanks to the way they can distribute and parallelize tasks, however, that does not mean that they are infinitely configurable.
+
+The workflows found here leverage a relatively new feature of Github called reusable workflows: https://docs.github.com/en/actions/using-workflows/reusing-workflows
+
+The extensibility of these Nx Cloud workflows is therefore strictly bound by the capabilities of the Github feature.
+
+This means that you cannot do things such as embed additional Github actions within the workflow, or majorly customize the steps we have set up for you.
+
+If you find yourself needing to customize things beyond what is supported by Github reusable workflows, then the best way is to simply take a look at the source of the workflows within this repo [./.github/workflows](./.github/workflows) and use that as your starting point directly within your own configs.
+
 ## Example Usage
 
 The following will configure a CI workflow which runs on the `main` branch, and on all pull requests into the `main` branch. The CI workflow will do the following:
