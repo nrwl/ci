@@ -21,6 +21,11 @@ on:
       install-command:
         required: false
         type: string
+      # We needed this input in order to be able to configure out integration tests for this repo, it is not documented
+      # so as to not cause confusion/add noise, but technically any consumer of the workflow can use it if they want to.
+      working-directory:
+        required: false
+        type: string
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
@@ -48,13 +53,16 @@ jobs:
       matrix:
         agent:
           - ${{fromJson(needs.set-agents.outputs.matrix)}}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory || github.workspace }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Detect package manager
         id: package_manager
         run: |
-          echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || "npm")"
+          echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
       - uses: volta-cli/action@fdf4cf319494429a105efaa71d0e5ec67f338c6e
