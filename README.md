@@ -139,11 +139,10 @@ jobs:
     # Pnpm gets installed only if pnpm-lock.yaml is present in your repo.
     pnpm-version: ""
 
-    # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
-    # you can do that here. If you do not specify one, it will check for the presence of a yarn.lock
-    # file in your repo, and if it finds one, run `yarn install --frozen-lockfile`. Otherwise it will
-    # run `npm ci`.
-    install-command: ""
+    # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
+    # you can do that here. If you do not specify one, it will check for the configured package manager
+    # (yarn, pnpm, or npm are currenctly supported) and run `npm ci` or `yarn install --frozen-lockfile`.
+    install-commands: ""
 ```
 
 <!-- end configuration-options-for-the-main-job -->
@@ -180,11 +179,10 @@ jobs:
     # Pnpm gets installed only if pnpm-lock.yaml is present in your repo.
     pnpm-version: ""
 
-    # [OPTIONAL] If you want to provide a specific install command to use when installing dependencies
-    # you can do that here. If you do not specify one, it will check for the presence of a yarn.lock
-    # file in your repo, and if it finds one, run `yarn install --frozen-lockfile`. Otherwise it will
-    # run `npm ci`.
-    install-command: ""
+    # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
+    # you can do that here. If you do not specify one, it will check for the configured package manager
+    # (yarn, pnpm, or npm are currenctly supported) and run `npm ci` or `yarn install --frozen-lockfile`.
+    install-commands: ""
 ```
 
 <!-- end configuration-options-for-agent-jobs -->
