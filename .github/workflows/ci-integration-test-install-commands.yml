@@ -19,26 +19,14 @@ jobs:
       install-commands: |
         echo "Installing dependencies with custom install-commands"
         npm ci
-        touch ./install-command-success
-        echo "install command end"
+        touch ./install-commands-success
+        echo "install commands end"
       parallel-commands: |
-        FILE=./install-command-success
-        if [ -f "$FILE" ]; then
-        echo "install-command success"
-        else
-          echo "fail: install-command did not run."
-          exit 1
-        fi
+        node -e "const f = require('fs'); if(f.existsSync('./install-commands-success')) console.log('install-commands success'); else { throw new Error('install commands did not run!');}"
         npx nx workspace-lint
         npx nx format:check
       parallel-commands-on-agents: |
-        FILE=./install-command-success
-        if [ -f "$FILE" ]; then
-          echo "install-command success"
-        else
-          echo "fail: install-command did not run."
-          exit 1
-        fi
+        node -e "const f = require('fs'); if(f.existsSync('./install-commands-success')) console.log('install-commands success on agent.'); else { throw new Error('install commands did not run!');}"
         npx nx affected --target=lint --parallel=3
         npx nx affected --target=test --parallel=3 --ci --code-coverage
         npx nx affected --target=build --parallel=3
@@ -52,5 +40,5 @@ jobs:
       install-commands: |
         echo "Installing dependencies with custom install-commands"
         npm ci
-        touch ./install-command-success
-        echo "install command end"
+        touch ./install-commands-success
+        echo "install commands end"
