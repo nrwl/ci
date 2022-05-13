@@ -1,7 +1,7 @@
 <p style="text-align: center;"><img src=".github/assets/nx.png" 
 width="100%" alt="Nx - Smart, Extensible Build Framework"></p>
 
-<h1 align="center">Nx Cloud Github Workflows</h2>
+<h1 align="center">Nx Cloud Github Workflows</h1>
 
 ✨ Github Workflows for easily configuring distributed CI pipelines powered by the speed and intelligence of Nx Cloud.
 
@@ -30,8 +30,8 @@ The following will configure a CI workflow which runs on the `main` branch, and 
 - Checkout your repo at the appropriate depth for determining affected projects
 - Determine the `head` and `base` SHAs to use for `nx affected`
 - Install nodejs
-- Use an appropriate node_module caching strategy for either `yarn` or `npm` (depending on which one is configured in your repo)
-- Install dependencies with either `yarn` or `npm` (depending on which one is configured in your repo)
+- Use an appropriate node_module caching strategy for either `yarn`, `npm` or `pnpm` (depending on which one is configured in your repo)
+- Install locked dependencies with either `yarn`, `npm` or `pnpm` (depending on which one is configured in your repo)
 - Spawn 3 agents ready to receive tasks/targets to run
 - Initiate all the provided commands in parallel, with those defined in `parallel-commands` being executed on the main job, and those in `parallel-commands-on-agents` being intelligently distributed across the 3 agents by Nx Cloud
 - Shut down all agents when all parallel tasks have completed
@@ -140,8 +140,7 @@ jobs:
     pnpm-version: ""
 
     # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
-    # you can do that here. If you do not specify one, it will check for the configured package manager
-    # (yarn, pnpm, or npm are currenctly supported) and run `npm ci` or `yarn install --frozen-lockfile`.
+    # you can do that here. The default install step is not executed when this input is given.
     install-commands: ""
 ```
 
@@ -180,8 +179,7 @@ jobs:
     pnpm-version: ""
 
     # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
-    # you can do that here. If you do not specify one, it will check for the configured package manager
-    # (yarn, pnpm, or npm are currenctly supported) and run `npm ci` or `yarn install --frozen-lockfile`.
+    # you can do that here. The default install step is not executed when this input is given.
     install-commands: ""
 ```
 
