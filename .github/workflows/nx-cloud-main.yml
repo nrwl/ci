@@ -27,7 +27,7 @@ on:
       pnpm-version:
         required: false
         type: string
-      install-command:
+      install-commands:
         required: false
         type: string
       main-branch-name:
@@ -140,12 +140,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-
 
-      - name: Install dependencies
+      - name: Run any configured install-commands
+        if: ${{ inputs.install-commands != '' }}
         run: |
-          if [ -n "${{ inputs.install-command }}" ]; then
-            echo "Running custom install-command: ${{ inputs.install-command }}"
-            ${{ inputs.install-command }}
-          elif [ "${{ steps.package_manager.outputs.name == 'yarn' }}" == "true" ]; then
+          ${{ inputs.install-commands }}
+      - name: Install dependencies
+        if: ${{ inputs.install-commands == '' }}
+        run: |
+          if [ "${{ steps.package_manager.outputs.name == 'yarn' }}" == "true" ]; then
             echo "Running yarn install --frozen-lockfile"
             yarn install --frozen-lockfile
           elif [ "${{ steps.package_manager.outputs.name == 'pnpm' }}" == "true" ]; then
