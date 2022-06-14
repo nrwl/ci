@@ -82,8 +82,8 @@ jobs:
 ```yaml
 - uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.3
   with:
-    # [OPTIONAL] The available number of agents use to fine tune
-    # Nx Cloud to intelligently distribute tasks in parallel.
+    # [OPTIONAL] The available number of agents used for fine tuning
+    # the Nx Cloud to intelligently distribute tasks in parallel.
     #
     # Default: 6
     number-of-agents: 3
