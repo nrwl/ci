@@ -3,6 +3,9 @@ name: Nx Cloud Main
 on:
   workflow_call:
     inputs:
+      number-of-agents:
+        required: false
+        type: number
       init-commands:
         required: false
         type: string
@@ -42,6 +45,7 @@ on:
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  NX_CLOUD_DISTRIBUTED_EXECUTION_AGENT_COUNT: ${{ inputs.number-of-agents || 6 }}
   NX_BRANCH: ${{ github.event.number || github.ref_name }}
 
 jobs:
