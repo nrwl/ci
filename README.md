@@ -84,8 +84,6 @@ jobs:
   with:
     # [OPTIONAL] The available number of agents used for fine tuning
     # the Nx Cloud to intelligently distribute tasks in parallel.
-    #
-    # Default: 6
     number-of-agents: 3
 
     # [OPTIONAL] A multi-line string representing any bash commands (separated by new lines) which should

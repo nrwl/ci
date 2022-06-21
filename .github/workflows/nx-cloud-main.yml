@@ -45,7 +45,7 @@ on:
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
-  NX_CLOUD_DISTRIBUTED_EXECUTION_AGENT_COUNT: ${{ inputs.number-of-agents || 6 }}
+  NX_CLOUD_DISTRIBUTED_EXECUTION_AGENT_COUNT: ${{ inputs.number-of-agents }}
   NX_BRANCH: ${{ github.event.number || github.ref_name }}
 
 jobs:
