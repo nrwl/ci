@@ -134,6 +134,7 @@ jobs:
 
     # [OPTIONAL] A multi-line string environment variables that needs to be passed from parent workflow
     # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
+    # Note: Environment variable cannot contain secret
     environment-variables: |
       ""
 
@@ -221,6 +222,7 @@ jobs:
 
     # [OPTIONAL] A multi-line string environment variables that needs to be passed from parent workflow
     # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
+    # Note: Environment variable cannot contain secret
     environment-variables: |
       ""
 
