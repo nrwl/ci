@@ -6,6 +6,9 @@ on:
       number-of-agents:
         required: true
         type: number
+      environment-variables:
+        required: false
+        type: string
       node-version:
         required: false
         type: string
@@ -128,6 +131,48 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-
 
+      - name: Process environment-variables
+        if: ${{ inputs.environment-variables != '' }}
+        uses: actions/github-script@v6
+        env:
+          ENV_VARS: ${{ inputs.environment-variables }}
+        with:
+          script: |
+            const { execSync } = require('child_process');
+
+            // trim spaces and escape quotes
+            const cleanStr = str => str
+              .trim()
+              .replaceAll(/'/g, "\'")
+              .replaceAll(/"/g, '\\\"');
+
+            // parse variable to correct type
+            const parseStr = str =>
+              str === 'true' || str === 'TRUE'
+                ? true
+                : str === 'false' || str === 'FALSE'
+                  ? false
+                  : isNaN(str)
+                    ? str
+                    : parseFloat(str);
+
+            // set variables to workflow's environment
+            const addWorkflowEnvVar = v => {
+              execSync(`echo "${v.name}=${parseStr(v.value)}" >> $GITHUB_ENV`);
+            }
+
+            const varsStr = process.env.ENV_VARS || '';
+            const vars = varsStr
+              .split('\n')
+              .map(variable => variable.trim())
+              .filter(variable => variable.indexOf('=') > 0)
+              .map(variable => ({
+                name: cleanStr(variable.split('=')[0]),
+                value: cleanStr(variable.slice(variable.indexOf('=') + 1))
+              }));
+
+            vars.forEach(addWorkflowEnvVar);
+
       - name: Run any configured install-commands
         if: ${{ inputs.install-commands != '' }}
         run: |
@@ -148,5 +193,5 @@ jobs:
 
       - name: Start Nx Agent ${{ matrix.agent }}
         run: npx nx-cloud start-agent
-        env: 
+        env:
           NX_AGENT_NAME: ${{matrix.agent}}
