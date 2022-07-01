@@ -75,11 +75,13 @@ jobs:
 
 <!-- end example-usage -->
 
-## Passing read-write Nx Cloud access token to workflow
+## Adding read-write Nx Cloud access token to workflow
 
 The main workflow supports passing `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` from the parent workflow.
-This is accomplished by adding `secrets: inherit` which copies over all secrets of the parent.
-These secrets are still kept encrypted and the `main` workflow will only use the `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` if defined.
+This is accomplished by adding `secrets: inherit` which gives access to the secrets of the parent.
+These secrets are still kept encrypted and the `main` workflow will only use the `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` 
+if those are defined.
+
 
 **.github/workflows/ci.yml**
 

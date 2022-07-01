@@ -5,10 +5,8 @@ on:
     secrets:
       NX_CLOUD_ACCESS_TOKEN:
         required: false
-        type: string
       NX_CLOUD_AUTH_TOKEN:
         required: false
-        type: string
     inputs:
       number-of-agents:
         required: false
