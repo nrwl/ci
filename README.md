@@ -150,6 +150,13 @@ jobs:
     # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
     # you can do that here. The default install step is not executed when this input is given.
     install-commands: ""
+    
+    # [OPTIONAL] Provides override for type of the machine to run the workflow on
+    # The machine can be either a GitHub-hosted runner or a self-hosted runner
+    # 
+    # NOTE: If you change this option, make sure it matches the agent configuration
+    # Default: ubuntu-latest
+    runs-on: ""
 ```
 
 <!-- end configuration-options-for-the-main-job -->
@@ -189,6 +196,13 @@ jobs:
     # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
     # you can do that here. The default install step is not executed when this input is given.
     install-commands: ""
+
+    # [OPTIONAL] Provides override for type of the machine to run the workflow on
+    # The machine can be either a GitHub-hosted runner or a self-hosted runner
+    # 
+    # NOTE: If you change this option, make sure it matches the main configuration
+    # Default: ubuntu-latest
+    runs-on: ""
 ```
 
 <!-- end configuration-options-for-agent-jobs -->

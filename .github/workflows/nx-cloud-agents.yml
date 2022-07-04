@@ -21,6 +21,10 @@ on:
       install-commands:
         required: false
         type: string
+      runs-on:
+        required: false
+        type: string
+        default: ubuntu-latest
       # We needed this input in order to be able to configure out integration tests for this repo, it is not documented
       # so as to not cause confusion/add noise, but technically any consumer of the workflow can use it if they want to.
       working-directory:
@@ -32,7 +36,7 @@ env:
 
 jobs:
   set-agents:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     name: Init
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
