@@ -142,6 +142,11 @@ jobs:
     # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
     # you can do that here. The default install step is not executed when this input is given.
     install-commands: ""
+    
+    # [OPTIONAL] If you want to provide specific agent environment.
+    # 
+    # Default: ubuntu-latest
+    runs-on: ""
 ```
 
 <!-- end configuration-options-for-the-main-job -->
