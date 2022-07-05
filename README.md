@@ -132,7 +132,7 @@ jobs:
     # reliably distribute the tasks.
     number-of-agents: 3
 
-    # [OPTIONAL] A multi-line string environment variables that needs to be passed from parent workflow
+    # [OPTIONAL] A multi-line string containing non-secret environment variables which need to be passed from the parent workflow
     # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
     # Note: Environment variable cannot contain secret
     environment-variables: |
