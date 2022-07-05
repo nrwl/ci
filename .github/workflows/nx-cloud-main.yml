@@ -71,6 +71,8 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.working-directory || github.workspace }}
+        # Specify shell to help normalize across different operating systems
+        shell: bash
     steps:
       - uses: actions/checkout@v2
         name: Checkout [Pull Request]
@@ -115,7 +117,6 @@ jobs:
 
       - name: Print node/npm/yarn versions
         id: versions
-        shell: bash
         run: |
           node_ver=$( node --version )
           yarn_ver=$( yarn --version || true )
@@ -167,13 +168,12 @@ jobs:
           ENV_VARS: ${{ inputs.environment-variables }}
         with:
           script: |
-            const { execSync } = require('child_process');
+            const { appendFileSync } = require('fs');
 
             // trim spaces and escape quotes
             const cleanStr = str => str
               .trim()
-              .replaceAll(/'/g, "\'")
-              .replaceAll(/"/g, '\\\"');
+              .replaceAll(/`/g, "\`");
 
             // parse variable to correct type
             const parseStr = str =>
@@ -185,11 +185,6 @@ jobs:
                     ? str
                     : parseFloat(str);
 
-            // set variables to workflow's environment
-            const addWorkflowEnvVar = v => {
-              execSync(`echo "${v.name}=${parseStr(v.value)}" >> $GITHUB_ENV`);
-            }
-
             const varsStr = process.env.ENV_VARS || '';
             const vars = varsStr
               .split('\n')
@@ -200,17 +195,18 @@ jobs:
                 value: cleanStr(variable.slice(variable.indexOf('=') + 1))
               }));
 
-            vars.forEach(addWorkflowEnvVar);
+            for (const v of vars) {
+              console.log(`Appending environment variable \`${v.name}\` with value \`${v.value}\` to ${process.env.GITHUB_ENV}`);
+              appendFileSync(process.env.GITHUB_ENV, `${v.name}=${parseStr(v.value)}\n`);
+            }
 
       - name: Run any configured install-commands
         if: ${{ inputs.install-commands != '' }}
-        shell: bash
         run: |
           ${{ inputs.install-commands }}
 
       - name: Install dependencies
         if: ${{ inputs.install-commands == '' }}
-        shell: bash
         run: |
           if [ "${{ steps.package_manager.outputs.name == 'yarn' }}" == "true" ]; then
             echo "Running yarn install --frozen-lockfile"
@@ -255,7 +251,8 @@ jobs:
             writeFileSync('./.github/workflows/run-commands-in-parallel.sh', runCommandsInParallelScript);
 
       - name: Prepare command utils
-        run: chmod +x ${{ github.workspace }}/.github/workflows/run-commands-in-parallel.sh
+        # We need to escape the workspace path to be consistent cross-platform: https://github.com/actions/runner/issues/1066
+        run: chmod +x ${GITHUB_WORKSPACE//\\//}/.github/workflows/run-commands-in-parallel.sh
 
       - name: Initialize the Nx Cloud distributed CI run
         run: npx nx-cloud start-ci-run
@@ -264,7 +261,6 @@ jobs:
       # how we want it to in terms of quote escaping, variable assignment etc
       - name: Run any configured init-commands sequentially
         if: ${{ inputs.init-commands != '' }}
-        shell: bash
         run: |
           ${{ inputs.init-commands }}
 
@@ -309,14 +305,13 @@ jobs:
           result-encoding: string
 
       - name: Run any configured parallel commands on main and agent jobs
-        run: ${{ github.workspace }}/.github/workflows/run-commands-in-parallel.sh '${{ steps.parallel_commands_config.outputs.result }}'
-        shell: bash
+        # We need to escape the workspace path to be consistent cross-platform: https://github.com/actions/runner/issues/1066
+        run: ${GITHUB_WORKSPACE//\\//}/.github/workflows/run-commands-in-parallel.sh '${{ steps.parallel_commands_config.outputs.result }}'
 
       # The good thing about the multi-line string input for sequential commands is that we can simply forward it on as is to the bash shell and it will behave
       # how we want it to in terms of quote escaping, variable assignment etc
       - name: Run any configured final-commands sequentially
         if: ${{ inputs.final-commands != '' }}
-        shell: bash
         run: |
           ${{ inputs.final-commands }}
 

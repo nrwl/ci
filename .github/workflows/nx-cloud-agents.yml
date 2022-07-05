@@ -64,12 +64,13 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.working-directory || github.workspace }}
+        # Specify shell to help normalize across different operating systems
+        shell: bash
     steps:
       - uses: actions/checkout@v2
 
       - name: Detect package manager
         id: package_manager
-        shell: bash
         run: |
           echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
@@ -89,7 +90,6 @@ jobs:
 
       - name: Print node/npm/yarn versions
         id: versions
-        shell: bash
         run: |
           node_ver=$( node --version )
           yarn_ver=$( yarn --version || true )
@@ -141,13 +141,12 @@ jobs:
           ENV_VARS: ${{ inputs.environment-variables }}
         with:
           script: |
-            const { execSync } = require('child_process');
+            const { appendFileSync } = require('fs');
 
             // trim spaces and escape quotes
             const cleanStr = str => str
               .trim()
-              .replaceAll(/'/g, "\'")
-              .replaceAll(/"/g, '\\\"');
+              .replaceAll(/`/g, "\`");
 
             // parse variable to correct type
             const parseStr = str =>
@@ -159,11 +158,6 @@ jobs:
                     ? str
                     : parseFloat(str);
 
-            // set variables to workflow's environment
-            const addWorkflowEnvVar = v => {
-              execSync(`echo "${v.name}=${parseStr(v.value)}" >> $GITHUB_ENV`);
-            }
-
             const varsStr = process.env.ENV_VARS || '';
             const vars = varsStr
               .split('\n')
@@ -174,17 +168,18 @@ jobs:
                 value: cleanStr(variable.slice(variable.indexOf('=') + 1))
               }));
 
-            vars.forEach(addWorkflowEnvVar);
+            for (const v of vars) {
+              console.log(`Appending environment variable \`${v.name}\` with value \`${v.value}\` to ${process.env.GITHUB_ENV}`);
+              appendFileSync(process.env.GITHUB_ENV, `${v.name}=${parseStr(v.value)}\n`);
+            }
 
       - name: Run any configured install-commands
         if: ${{ inputs.install-commands != '' }}
-        shell: bash
         run: |
           ${{ inputs.install-commands }}
 
       - name: Install dependencies
         if: ${{ inputs.install-commands == '' }}
-        shell: bash
         run: |
           if [ "${{ steps.package_manager.outputs.name == 'yarn' }}" == "true" ]; then
             echo "Running yarn install --frozen-lockfile"
