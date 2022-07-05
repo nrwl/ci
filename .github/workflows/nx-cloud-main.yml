@@ -95,6 +95,7 @@ jobs:
 
       - name: Detect package manager
         id: package_manager
+        shell: bash
         run: |
           echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
@@ -114,6 +115,7 @@ jobs:
 
       - name: Print node/npm/yarn versions
         id: versions
+        shell: bash
         run: |
           node_ver=$( node --version )
           yarn_ver=$( yarn --version || true )
@@ -202,10 +204,13 @@ jobs:
 
       - name: Run any configured install-commands
         if: ${{ inputs.install-commands != '' }}
+        shell: bash
         run: |
           ${{ inputs.install-commands }}
+
       - name: Install dependencies
         if: ${{ inputs.install-commands == '' }}
+        shell: bash
         run: |
           if [ "${{ steps.package_manager.outputs.name == 'yarn' }}" == "true" ]; then
             echo "Running yarn install --frozen-lockfile"
