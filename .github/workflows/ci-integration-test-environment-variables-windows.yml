@@ -1,4 +1,4 @@
-name: CI - integration test environment-variables input
+name: CI - integration test environment-variables input on windows
 
 on:
   push:

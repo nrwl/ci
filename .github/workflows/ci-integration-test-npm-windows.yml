@@ -1,4 +1,4 @@
-name: CI - integration test npm
+name: CI - integration test npm on windows
 
 on:
   push:
