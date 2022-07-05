@@ -134,7 +134,7 @@ jobs:
 
     # [OPTIONAL] A multi-line string containing non-secret environment variables which need to be passed from the parent workflow
     # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
-    # Note: Environment variable cannot contain secret
+    # Note: Environment variables cannot contain values derived from ${{ secrets }} because of how reusable workflows work
     environment-variables: |
       ""
 
