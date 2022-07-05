@@ -134,7 +134,9 @@ jobs:
 
     # [OPTIONAL] A multi-line string containing non-secret environment variables which need to be passed from the parent workflow
     # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
-    # Note: Environment variables cannot contain values derived from ${{ secrets }} because of how reusable workflows work
+    #
+    # NOTE: Environment variables cannot contain values derived from ${{ secrets }}
+    # because of how reusable workflows work
     environment-variables: |
       ""
 
@@ -220,9 +222,11 @@ jobs:
     # allow Nx Cloud to intelligently distribute tasks in parallel.
     number-of-agents: 3
 
-    # [OPTIONAL] A multi-line string environment variables that needs to be passed from parent workflow
+    # [OPTIONAL] A multi-line string containing non-secret environment variables which need to be passed from the parent workflow
     # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
-    # Note: Environment variable cannot contain secret
+    #
+    # NOTE: Environment variables cannot contain values derived from ${{ secrets }} 
+    # because of how reusable workflows work
     environment-variables: |
       ""
 
