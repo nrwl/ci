@@ -1,0 +1,42 @@
+name: CI - integration test environment-variables input on windows
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    name: Nx Cloud - Main Job
+    uses: ./.github/workflows/nx-cloud-main.yml
+    with:
+      runs-on: windows-latest
+      working-directory: ./integration-tests/npm
+      environment-variables: |
+        MY_BOOLEAN=true
+        CAPITAL_BOOLEAN =FALSE
+        SOME_NUMBER= 42
+        OTHER_TEXT = some other "text"
+      parallel-commands: |
+        node -e "if(process.env.SOME_NUMBER == 42) console.log('Number parsing successful'); else { throw new Error('Number parsing failed!');}"
+        node -e "if(process.env.MY_BOOLEAN == 'true') console.log('Boolean parsing successful'); else { throw new Error('Boolean parsing failed!');}"
+        node -e "if(process.env.CAPITAL_BOOLEAN == 'false') console.log('Capital boolean parsing successful'); else { throw new Error('Capital boolean parsing failed!');}"
+        node -e "if(process.env.OTHER_TEXT == 'some other \\"text\\"') console.log('Text parsing successful'); else { throw new Error('Text parsing failed!');}"
+      parallel-commands-on-agents: |
+        node -e "if(process.env.SOME_NUMBER == 42) console.log('Number parsing on agent successful'); else { throw new Error('Number parsing on agent failed!');}"
+        node -e "if(process.env.MY_BOOLEAN == 'true') console.log('Boolean parsing on agent successful'); else { throw new Error('Boolean parsing on agent failed!');}"
+        node -e "if(process.env.CAPITAL_BOOLEAN == 'false') console.log('Capital boolean parsing on agent successful'); else { throw new Error('Capital boolean parsing on agent failed!');}"
+        node -e "if(process.env.OTHER_TEXT == 'some other \\"text\\"') console.log('Text parsing on agent successful'); else { throw new Error('Text parsing on agent failed!');}"
+
+  agents:
+    name: Nx Cloud - Agents
+    uses: ./.github/workflows/nx-cloud-agents.yml
+    with:
+      runs-on: windows-latest
+      working-directory: ./integration-tests/npm
+      number-of-agents: 3

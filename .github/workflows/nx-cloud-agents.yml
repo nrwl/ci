@@ -6,6 +6,9 @@ on:
       number-of-agents:
         required: true
         type: number
+      environment-variables:
+        required: false
+        type: string
       node-version:
         required: false
         type: string
@@ -42,6 +45,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
+        shell: bash
         # Turn the number-of-agents input into a JSON structure which is compatible with a Github job matrix strategy
         run: |
           AGENTS_JSON_ARRAY=$(node -e "console.log(JSON.stringify(Array.from(new Array(${{ inputs.number-of-agents }})).map((_, i) => i + 1)));")
@@ -60,6 +64,8 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.working-directory || github.workspace }}
+        # Specify shell to help normalize across different operating systems
+        shell: bash
     steps:
       - uses: actions/checkout@v2
 
@@ -128,10 +134,50 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-
 
+      - name: Process environment-variables
+        if: ${{ inputs.environment-variables != '' }}
+        uses: actions/github-script@v6
+        env:
+          ENV_VARS: ${{ inputs.environment-variables }}
+        with:
+          script: |
+            const { appendFileSync } = require('fs');
+
+            // trim spaces and escape quotes
+            const cleanStr = str => str
+              .trim()
+              .replaceAll(/`/g, "\`");
+
+            // parse variable to correct type
+            const parseStr = str =>
+              str === 'true' || str === 'TRUE'
+                ? true
+                : str === 'false' || str === 'FALSE'
+                  ? false
+                  : isNaN(str)
+                    ? str
+                    : parseFloat(str);
+
+            const varsStr = process.env.ENV_VARS || '';
+            const vars = varsStr
+              .split('\n')
+              .map(variable => variable.trim())
+              .filter(variable => variable.indexOf('=') > 0)
+              .map(variable => ({
+                name: cleanStr(variable.split('=')[0]),
+                value: cleanStr(variable.slice(variable.indexOf('=') + 1))
+              }));
+
+            for (const v of vars) {
+              console.log(`Appending environment variable \`${v.name}\` with value \`${v.value}\` to ${process.env.GITHUB_ENV}`);
+              appendFileSync(process.env.GITHUB_ENV, `${v.name}=${parseStr(v.value)}\n`);
+            }
+
       - name: Run any configured install-commands
         if: ${{ inputs.install-commands != '' }}
         run: |
           ${{ inputs.install-commands }}
+
       - name: Install dependencies
         if: ${{ inputs.install-commands == '' }}
         run: |
@@ -148,5 +194,5 @@ jobs:
 
       - name: Start Nx Agent ${{ matrix.agent }}
         run: npx nx-cloud start-agent
-        env: 
+        env:
           NX_AGENT_NAME: ${{matrix.agent}}

@@ -21,11 +21,11 @@ The extensibility of these Nx Cloud workflows is therefore strictly bound by the
 
 This means that you cannot do things such as embed additional Github actions within the workflow, or majorly customize the steps we have set up for you.
 
-If you find yourself needing to customize things beyond what is supported by Github reusable workflows, then the best way is to simply take a look at the source of the workflows within this repo [./.github/workflows](./.github/workflows) and use that as your starting point directly within your own configs.
+If you find yourself needing to customize things beyond what is supported by Github reusable workflows, then the best way is to simply take a look at the source of the workflows within this repo [./.github/workflows](./.github/workflows) and use that as your starting point directly within your configs.
 
 ## Example Usage
 
-The following will configure a CI workflow which runs on the `main` branch, and on all pull requests into the `main` branch. The CI workflow will do the following:
+The following will configure a CI workflow that runs on the `main` branch, and on all pull requests into the `main` branch. The CI workflow will do the following:
 
 - Checkout your repo at the appropriate depth for determining affected projects
 - Determine the `head` and `base` SHAs to use for `nx affected`
@@ -34,7 +34,7 @@ The following will configure a CI workflow which runs on the `main` branch, and 
 - Install locked dependencies with either `yarn`, `npm` or `pnpm` (depending on which one is configured in your repo)
 - Spawn 3 agents ready to receive tasks/targets to run
 - Initiate all the provided commands in parallel, with those defined in `parallel-commands` being executed on the main job, and those in `parallel-commands-on-agents` being intelligently distributed across the 3 agents by Nx Cloud
-- Shut down all agents when all parallel tasks have completed
+- Shut down all agents when all parallel tasks have been completed
 
 **.github/workflows/ci.yml**
 
@@ -56,7 +56,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.5
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.6
     with:
       parallel-commands: |
         npx nx workspace-lint
@@ -68,7 +68,7 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.5
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.6
     with:
       number-of-agents: 3
 ```
@@ -122,7 +122,7 @@ jobs:
 <!-- start configuration-options-for-the-main-job -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.5
+- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.6
   with:
     # [OPTIONAL] The available number of agents used by the Nx Cloud to distribute tasks in parallel.
     # By default, NxCloud tries to infer dynamically how many agents you have available. Some agents 
@@ -131,6 +131,14 @@ jobs:
     # If you know exactly how many agents you have available, it is recommended to set this so we can more 
     # reliably distribute the tasks.
     number-of-agents: 3
+
+    # [OPTIONAL] A multi-line string containing non-secret environment variables which need to be passed from the parent workflow
+    # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
+    #
+    # NOTE: Environment variables cannot contain values derived from ${{ secrets }}
+    # because of how reusable workflows work
+    environment-variables: |
+      ""
 
     # [OPTIONAL] A multi-line string representing any bash commands (separated by new lines) which should
     # run sequentially, directly on the main job BEFORE executing any of the parallel commands which
@@ -208,11 +216,19 @@ jobs:
 <!-- start configuration-options-for-agent-jobs -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.5
+- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.6
   with:
     # [REQUIRED] The number of agents which should be created as part of the workflow in order to
     # allow Nx Cloud to intelligently distribute tasks in parallel.
     number-of-agents: 3
+
+    # [OPTIONAL] A multi-line string containing non-secret environment variables which need to be passed from the parent workflow
+    # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
+    #
+    # NOTE: Environment variables cannot contain values derived from ${{ secrets }} 
+    # because of how reusable workflows work
+    environment-variables: |
+      ""
 
     # [OPTIONAL] If you want to provide a specific node-version to use you can do that here.
     # If you do not specify one, it will respect an optional volta config you might have in
