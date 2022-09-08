@@ -63,7 +63,7 @@ jobs:
   # Intentionally using capital letter in order to make the Github UI for the matrix look better
   Run:
     needs: set-agents
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     name: Agent ${{ matrix.agent }}
     strategy:
       matrix:
