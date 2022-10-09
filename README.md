@@ -56,7 +56,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.7
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.8
     with:
       parallel-commands: |
         npx nx workspace-lint
@@ -68,7 +68,7 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.7
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.8
     with:
       number-of-agents: 3
 ```
@@ -79,9 +79,8 @@ jobs:
 
 The main and agent workflows both support passing `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` from the parent workflow.
 This is accomplished by adding `secrets: inherit` which gives access to the secrets of the parent.
-These secrets are still kept encrypted and the `main` workflow will only use the `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` 
+These secrets are still kept encrypted and the `main` workflow will only use the `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN`
 if those are defined.
-
 
 **.github/workflows/ci.yml**
 
@@ -103,17 +102,15 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.7
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.8
     secrets: inherit
-    with:
-      ...
+    with: ...
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.7
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.8
     secrets: inherit
-    with:
-      ...
+    with: ...
 ```
 
 <!-- end example-usage -->
@@ -123,13 +120,13 @@ jobs:
 <!-- start configuration-options-for-the-main-job -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.7
+- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.8
   with:
     # [OPTIONAL] The available number of agents used by the Nx Cloud to distribute tasks in parallel.
-    # By default, NxCloud tries to infer dynamically how many agents you have available. Some agents 
+    # By default, NxCloud tries to infer dynamically how many agents you have available. Some agents
     # can have delayed start leading to incorrect count when distributing tasks.
     #
-    # If you know exactly how many agents you have available, it is recommended to set this so we can more 
+    # If you know exactly how many agents you have available, it is recommended to set this so we can more
     # reliably distribute the tasks.
     number-of-agents: 3
 
@@ -201,10 +198,10 @@ jobs:
     # [OPTIONAL] If you want to provide specific install commands to use when installing dependencies
     # you can do that here. The default install step is not executed when this input is given.
     install-commands: ""
-    
+
     # [OPTIONAL] Provides override for type of the machine to run the workflow on
     # The machine can be either a GitHub-hosted runner or a self-hosted runner
-    # 
+    #
     # NOTE: If you change this option, make sure it matches the agent configuration
     # Default: ubuntu-latest
     runs-on: ""
@@ -217,7 +214,7 @@ jobs:
 <!-- start configuration-options-for-agent-jobs -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.7
+- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.8
   with:
     # [REQUIRED] The number of agents which should be created as part of the workflow in order to
     # allow Nx Cloud to intelligently distribute tasks in parallel.
@@ -226,7 +223,7 @@ jobs:
     # [OPTIONAL] A multi-line string containing non-secret environment variables which need to be passed from the parent workflow
     # to the reusable workflow. The variables are defined in form `VARIABLE_NAME=value`
     #
-    # NOTE: Environment variables cannot contain values derived from ${{ secrets }} 
+    # NOTE: Environment variables cannot contain values derived from ${{ secrets }}
     # because of how reusable workflows work
     environment-variables: |
       ""
@@ -258,7 +255,7 @@ jobs:
 
     # [OPTIONAL] Provides override for type of the machine to run the workflow on
     # The machine can be either a GitHub-hosted runner or a self-hosted runner
-    # 
+    #
     # NOTE: If you change this option, make sure it matches the main configuration
     # Default: ubuntu-latest
     runs-on: ""
