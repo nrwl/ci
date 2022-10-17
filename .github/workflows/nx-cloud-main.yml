@@ -74,7 +74,7 @@ jobs:
         # Specify shell to help normalize across different operating systems
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         name: Checkout [Pull Request]
         if: ${{ github.event_name == 'pull_request' }}
         with:
@@ -83,7 +83,7 @@ jobs:
           # We need to fetch all branches and commits so that Nx affected has a base to compare against.
           fetch-depth: 0
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         name: Checkout [Default Branch]
         if: ${{ github.event_name != 'pull_request' }}
         with:
@@ -102,7 +102,7 @@ jobs:
           echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
 
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
-      - uses: volta-cli/action@fdf4cf319494429a105efaa71d0e5ec67f338c6e
+      - uses: volta-cli/action@v4
         with:
           node-version: "${{ inputs.node-version }}"
           npm-version: "${{ inputs.npm-version }}"
@@ -111,7 +111,7 @@ jobs:
       # Install pnpm with exact version provided by consumer or fallback to latest
       - name: Install PNPM
         if: steps.package_manager.outputs.name == 'pnpm'
-        uses: pnpm/action-setup@v2.2.1
+        uses: pnpm/action-setup@v2.2.2
         with:
           version: ${{ inputs.pnpm-version || 'latest' }}
 
@@ -131,7 +131,7 @@ jobs:
 
       - name: Use the node_modules cache if available [npm]
         if: steps.package_manager.outputs.name == 'npm'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
@@ -140,7 +140,7 @@ jobs:
 
       - name: Use the node_modules cache if available [pnpm]
         if: steps.package_manager.outputs.name == 'pnpm'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -154,7 +154,7 @@ jobs:
 
       - name: Use the node_modules cache if available [yarn]
         if: steps.package_manager.outputs.name == 'yarn'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-${{ hashFiles('**/yarn.lock') }}
