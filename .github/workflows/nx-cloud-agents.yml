@@ -58,7 +58,7 @@ jobs:
         run: |
           AGENTS_JSON_ARRAY=$(node -e "console.log(JSON.stringify(Array.from(new Array(${{ inputs.number-of-agents }})).map((_, i) => i + 1)));")
           echo $AGENTS_JSON_ARRAY
-          echo "::set-output name=matrix::$AGENTS_JSON_ARRAY"
+          echo "matrix=$AGENTS_JSON_ARRAY" >> $GITHUB_OUTPUT
 
   # Intentionally using capital letter in order to make the Github UI for the matrix look better
   Run:
@@ -80,7 +80,7 @@ jobs:
       - name: Detect package manager
         id: package_manager
         run: |
-          echo "::set-output name=name::$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")"
+          echo "name=$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")" >> $GITHUB_OUTPUT
 
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
       - uses: volta-cli/action@v4
@@ -108,7 +108,7 @@ jobs:
           if [[ $yarn_ver != '' ]]; then echo "Yarn: $yarn_ver"; fi
           if [[ $pnpm_ver != '' ]]; then echo "PNPM: $pnpm_ver"; fi
 
-          echo "::set-output name=node_version::${node_ver:1}"
+          echo "node_version=${node_ver:1}" >> $GITHUB_OUTPUT
 
       - name: Use the node_modules cache if available [npm]
         if: steps.package_manager.outputs.name == 'npm'
@@ -131,7 +131,7 @@ jobs:
       - name: Get yarn cache directory path
         if: steps.package_manager.outputs.name == 'yarn'
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "dir=$(yarn cache dir)" >> GITHUB_OUTPUT
 
       - name: Use the node_modules cache if available [yarn]
         if: steps.package_manager.outputs.name == 'yarn'
