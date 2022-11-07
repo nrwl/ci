@@ -1,4 +1,4 @@
-name: CI - integration test artifacts
+name: CI - integration test artifacts multiple folders
 
 on:
   push:
@@ -17,8 +17,11 @@ jobs:
     with:
       working-directory: ./integration-tests/npm
       parallel-commands-on-agents: |
+        npx nx run react-app:test --ci --coverage
         npx nx run react-app:build
-      artifacts: ./integration-tests/npm/dist/
+      artifacts: |
+        ./integration-tests/npm/dist/
+        ./integration-tests/npm/coverage/
 
   agents:
     name: Nx Cloud - Agents
