@@ -39,4 +39,4 @@ jobs:
         with:
           name: nx-main-artifacts
       - run: |
-        node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
+          node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
