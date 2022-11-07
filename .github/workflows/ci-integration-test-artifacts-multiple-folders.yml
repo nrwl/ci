@@ -1,4 +1,4 @@
-name: CI - integration test artifacts multiple folders
+name: CI - integration test artifacts
 
 on:
   push:
@@ -17,11 +17,8 @@ jobs:
     with:
       working-directory: ./integration-tests/npm
       parallel-commands-on-agents: |
-        npx nx run react-app:test --ci --coverage
         npx nx run react-app:build
-      artifacts: |
-        ./integration-tests/npm/dist/
-        ./integration-tests/npm/coverage/
+      artifacts: ./integration-tests/npm/dist/
 
   agents:
     name: Nx Cloud - Agents
@@ -38,5 +35,5 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: nx-main-artifacts
-      - run: |
-          node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
+          path: dist
+      - run: node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
