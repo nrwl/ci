@@ -210,7 +210,7 @@ jobs:
     # [upload-artifact](https://github.com/actions/upload-artifact) action. The name of the artifacts
     # will be `nx-main-artifacts`.
     #
-    # NOTE: To download your artifact in anothe job you need to use the [download-artifact](https://github.com/actions/download-artifact) action
+    # NOTE: To download your artifact in another job you need to use the [download-artifact](https://github.com/actions/download-artifact) action
     # Default: ""
     artifacts: ""
 ```
