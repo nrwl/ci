@@ -49,11 +49,11 @@ on:
         required: false
         type: string
         default: ubuntu-latest
-      artifacts:
+      artifacts-path:
         required: false
         type: string
         default: ""
-      artifactsName:
+      artifacts-name:
         required: false
         type: string
         default: "nx-main-artifacts"
@@ -330,7 +330,7 @@ jobs:
 
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3
-        if: ${{ inputs.artifacts != '' }}
+        if: ${{ inputs.artifacts-path != '' }}
         with:
-          name: ${{ inputs.artifactsName }}
-          path: ${{ inputs.artifacts }}
+          name: ${{ inputs.artifacts-name }}
+          path: ${{ inputs.artifacts-path }}

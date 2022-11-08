@@ -18,7 +18,7 @@ jobs:
       working-directory: ./integration-tests/npm
       parallel-commands-on-agents: |
         npx nx run react-app:build
-      artifacts: ./integration-tests/npm/dist/
+      artifacts-path: ./integration-tests/npm/dist/
 
   agents:
     name: Nx Cloud - Agents

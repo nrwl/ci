@@ -215,13 +215,13 @@ jobs:
     #
     # NOTE: To download your artifact in another job you need to use the [download-artifact](https://github.com/actions/download-artifact) action
     # Default: ""
-    artifacts: ""
+    artifacts-path: ""
 
     # [OPTIONAL] Provide the name of uploaded artifacts.
     #
     # NOTE: This input only has an effect if used with the `artifacts` input.
     # Default: "nx-main-artifacts"
-    artifactsName: ""
+    artifacts-name: ""
 ```
 
 <!-- end configuration-options-for-the-main-job -->

@@ -19,10 +19,10 @@ jobs:
       parallel-commands-on-agents: |
         npx nx run react-app:test --ci --coverage
         npx nx run react-app:build
-      artifacts: |
+      artifacts-path: |
         ./integration-tests/npm/dist/
         ./integration-tests/npm/coverage/
-      artifactsName: custom-artifacts-name
+      artifacts-name: custom-artifacts-name
 
   agents:
     name: Nx Cloud - Agents
