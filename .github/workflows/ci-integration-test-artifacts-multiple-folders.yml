@@ -22,6 +22,7 @@ jobs:
       artifacts: |
         ./integration-tests/npm/dist/
         ./integration-tests/npm/coverage/
+      artifactsName: custom-artifacts-name
 
   agents:
     name: Nx Cloud - Agents
@@ -37,5 +38,5 @@ jobs:
       - name: "Downloading artifacts"
         uses: actions/download-artifact@v3
         with:
-          name: nx-main-artifacts
+          name: custom-artifacts-name
       - run: node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"

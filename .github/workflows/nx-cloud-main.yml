@@ -53,6 +53,10 @@ on:
         required: false
         type: string
         default: ""
+      artifactsName:
+        required: false
+        type: string
+        default: "nx-main-artifacts"
       # We needed this input in order to be able to configure out integration tests for this repo, it is not documented
       # so as to not cause confusion/add noise, but technically any consumer of the workflow can use it if they want to.
       working-directory:
@@ -328,5 +332,5 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ inputs.artifacts != '' }}
         with:
-          name: nx-main-artifacts
+          name: ${{ inputs.artifactsName }}
           path: ${{ inputs.artifacts }}
