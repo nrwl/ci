@@ -219,7 +219,7 @@ jobs:
 
     # [OPTIONAL] Provide the name of uploaded artifacts.
     #
-    # NOTE: This input only has an effect if used with the `artifacts` input.
+    # NOTE: This input only has an effect if used with the `artifacts-path` input.
     # Default: "nx-main-artifacts"
     artifacts-name: ""
 ```
