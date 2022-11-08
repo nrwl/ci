@@ -211,7 +211,7 @@ jobs:
 
     # [OPTIONAL] If you want to upload artifacts, please provide the paths as are required by the
     # [upload-artifact](https://github.com/actions/upload-artifact) action. The name of the artifacts
-    # will be `nx-main-artifacts`.
+    # will be the value of the `artifacts-name` input.
     #
     # NOTE: To download your artifact in another job you need to use the [download-artifact](https://github.com/actions/download-artifact) action
     # Default: ""
