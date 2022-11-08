@@ -1,4 +1,4 @@
-<p style="text-align: center;"><img src=".github/assets/nx.png" 
+<p style="text-align: center;"><img src=".github/assets/nx.png"
 width="100%" alt="Nx - Smart, Extensible Build Framework"></p>
 
 <h1 align="center">Nx Cloud Github Workflows</h1>
@@ -208,6 +208,20 @@ jobs:
     # NOTE: If you change this option, make sure it matches the agent configuration
     # Default: ubuntu-latest
     runs-on: ""
+
+    # [OPTIONAL] If you want to upload artifacts, please provide the paths as are required by the
+    # [upload-artifact](https://github.com/actions/upload-artifact) action. The name of the artifacts
+    # will be the value of the `artifacts-name` input.
+    #
+    # NOTE: To download your artifact in another job you need to use the [download-artifact](https://github.com/actions/download-artifact) action
+    # Default: ""
+    artifacts-path: ""
+
+    # [OPTIONAL] Provide the name of uploaded artifacts.
+    #
+    # NOTE: This input only has an effect if used with the `artifacts-path` input.
+    # Default: "nx-main-artifacts"
+    artifacts-name: ""
 ```
 
 <!-- end configuration-options-for-the-main-job -->

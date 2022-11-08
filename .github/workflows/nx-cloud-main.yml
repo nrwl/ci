@@ -49,6 +49,14 @@ on:
         required: false
         type: string
         default: ubuntu-latest
+      artifacts-path:
+        required: false
+        type: string
+        default: ""
+      artifacts-name:
+        required: false
+        type: string
+        default: "nx-main-artifacts"
       # We needed this input in order to be able to configure out integration tests for this repo, it is not documented
       # so as to not cause confusion/add noise, but technically any consumer of the workflow can use it if they want to.
       working-directory:
@@ -319,3 +327,10 @@ jobs:
         # It's important that we always run this step, otherwise in the case of any failures in preceding non-Nx steps, the agents will keep running and waste billable minutes
         if: ${{ always() }}
         run: npx nx-cloud stop-all-agents
+
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.artifacts-path != '' }}
+        with:
+          name: ${{ inputs.artifacts-name }}
+          path: ${{ inputs.artifacts-path }}

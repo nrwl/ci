@@ -1,0 +1,42 @@
+name: CI - integration test artifacts multiple folders
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    name: Nx Cloud - Main Job
+    uses: ./.github/workflows/nx-cloud-main.yml
+    with:
+      working-directory: ./integration-tests/npm
+      parallel-commands-on-agents: |
+        npx nx run react-app:test --ci --coverage
+        npx nx run react-app:build
+      artifacts-path: |
+        ./integration-tests/npm/dist/
+        ./integration-tests/npm/coverage/
+      artifacts-name: custom-artifacts-name
+
+  agents:
+    name: Nx Cloud - Agents
+    uses: ./.github/workflows/nx-cloud-agents.yml
+    with:
+      working-directory: ./integration-tests/npm
+      number-of-agents: 1
+
+  check-artifact:
+    needs: main
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Downloading artifacts"
+        uses: actions/download-artifact@v3
+        with:
+          name: custom-artifacts-name
+      - run: node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
