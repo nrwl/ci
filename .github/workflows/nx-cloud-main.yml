@@ -180,9 +180,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.yarn-berry-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-berry-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-berry-
 
       - name: Process environment-variables
         if: ${{ inputs.environment-variables != '' }}
