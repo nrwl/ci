@@ -1,4 +1,4 @@
-name: CI - integration test yarn
+name: CI - integration test yarn berry
 
 on:
   push:
