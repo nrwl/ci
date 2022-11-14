@@ -17,12 +17,12 @@ jobs:
     with:
       working-directory: ./integration-tests/yarn
       parallel-commands: |
-        npx nx workspace-lint
-        npx nx format:check
+        yarn nx workspace-lint
+        yarn nx format:check
       parallel-commands-on-agents: |
-        npx nx affected --target=lint --parallel=3
-        npx nx affected --target=test --parallel=3 --ci --code-coverage
-        npx nx affected --target=build --parallel=3
+        yarn nx affected --target=lint --parallel=3
+        yarn nx affected --target=test --parallel=3 --ci --code-coverage
+        yarn nx affected --target=build --parallel=3
 
   agents:
     name: Nx Cloud - Agents
