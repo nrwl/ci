@@ -1,4 +1,4 @@
-name: CI - integration test yarn
+name: CI - integration test yarn berry
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     name: Nx Cloud - Main Job
     uses: ./.github/workflows/nx-cloud-main.yml
     with:
-      working-directory: ./integration-tests/yarn
+      working-directory: ./integration-tests/yarn-berry
       parallel-commands: |
         yarn nx workspace-lint
         yarn nx format:check
@@ -28,5 +28,5 @@ jobs:
     name: Nx Cloud - Agents
     uses: ./.github/workflows/nx-cloud-agents.yml
     with:
-      working-directory: ./integration-tests/yarn
+      working-directory: ./integration-tests/yarn-berry
       number-of-agents: 3
