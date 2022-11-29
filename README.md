@@ -7,7 +7,7 @@ width="100%" alt="Nx - Smart, Extensible Build Framework"></p>
 
 - [Disclaimer: Github Workflow Limitations](#disclaimer-github-workflow-limitations)
 - [Example Usage](#example-usage)
-- [Adding read-write Nx Cloud access token to workflow](#adding-read-write-nx-cloud-access-token-to-workflow)
+- [Limited Secrets Support](#limited-secrets-support)
 - [Configuration Options for the Main Job (nx-cloud-main.yml)](#configuration-options-for-the-main-job-nx-cloud-mainyml)
 - [Configuration Options for Agent Jobs (nx-cloud-agents.yml)](#configuration-options-for-agent-jobs-nx-cloud-agentsyml)
 
@@ -24,6 +24,8 @@ The extensibility of these Nx Cloud workflows is therefore strictly bound by the
 This means that you cannot do things such as embed additional Github actions within the workflow, or majorly customize the steps we have set up for you.
 
 If you find yourself needing to customize things beyond what is supported by Github reusable workflows, then the best way is to simply take a look at the source of the workflows within this repo [./.github/workflows](./.github/workflows) and use that as your starting point directly within your configs.
+
+> NOTE: Another really important limitation of these reusable Github workflows is that you are not allowed to pass data from the special `${{ secrets }}` namespace into the workflow you are invoking (i.e. `nrwl/ci`). If you find yourself needing to use secret values beyond the small number we have explicitly built support for, you will again need to use this project as inspiration, rather than using it directly.
 
 ## Example Usage
 
@@ -58,7 +60,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.9
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.11
     with:
       # NOTE: Here we are using the special `nx-cloud record` command to ensure that any commands we run that do not go through the cloud task runner natively
       # (i.e. anything that starts with `nx run`/`nx run-many`/`nx affected --target`), are still captured in the Nx Cloud UI and Github App comment for
@@ -73,18 +75,20 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.9
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.11
     with:
       number-of-agents: 3
 ```
 
 <!-- end example-usage -->
 
-## Adding read-write Nx Cloud access token to workflow
+## Limited Secrets Support
 
-The main and agent workflows both support passing `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` from the parent workflow.
-These secrets are still kept encrypted and the `main` workflow will only use the `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN`
-if those are defined.
+As noted above, it is not possible to generically forward values from the special `${{ secrets }}` namespace into this workflow, because of the limitations of Github reusable workflows.
+
+Nevertheless, we have set up some explicit handling for the most common secret values that folks would need in the simple CI setups that this workflow is intended to support.
+
+For example, the main and agent workflows both support passing `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` from the parent workflow. These secrets are still kept encrypted and the `main` workflow will only use the `NX_CLOUD_AUTH_TOKEN` and `NX_CLOUD_ACCESS_TOKEN` if those are defined.
 
 **.github/workflows/ci.yml**
 
@@ -106,7 +110,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.9
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.11
     secrets:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
@@ -114,12 +118,14 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.9
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.11
     secrets:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
     with: ...
 ```
+
+See the annotated configuration below for all explicitly supported secret values.
 
 <!-- end example-usage -->
 
@@ -128,7 +134,14 @@ jobs:
 <!-- start configuration-options-for-the-main-job -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.9
+- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.11
+  # [OPTIONAL] Explicitly supported secret values which can be passed into the workflow from your outer workflow run.
+  #
+  # NOTE: You cannot access values from ${{ secrets }} beyond what is explicitly specified here because of the limitations of reusable Github workflows
+  secrets:
+    NPM_TOKEN: ""
+    NX_CLOUD_ACCESS_TOKEN: ""
+    NX_CLOUD_AUTH_TOKEN: ""
   with:
     # [OPTIONAL] The available number of agents used by the Nx Cloud to distribute tasks in parallel.
     # By default, NxCloud tries to infer dynamically how many agents you have available. Some agents
@@ -236,7 +249,14 @@ jobs:
 <!-- start configuration-options-for-agent-jobs -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.9
+- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.11
+  # [OPTIONAL] Explicitly supported secret values which can be passed into the workflow from your outer workflow run.
+  #
+  # NOTE: You cannot access values from ${{ secrets }} beyond what is explicitly specified here because of the limitations of reusable Github workflows
+  secrets:
+    NPM_TOKEN: ""
+    NX_CLOUD_ACCESS_TOKEN: ""
+    NX_CLOUD_AUTH_TOKEN: ""
   with:
     # [REQUIRED] The number of agents which should be created as part of the workflow in order to
     # allow Nx Cloud to intelligently distribute tasks in parallel.
