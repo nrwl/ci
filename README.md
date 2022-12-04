@@ -5,9 +5,11 @@ width="100%" alt="Nx - Smart, Extensible Build Framework"></p>
 
 ✨ Github Workflows for easily configuring distributed CI pipelines powered by the speed and intelligence of Nx Cloud.
 
+- [Disclaimer: Github Workflow Limitations](#disclaimer-github-workflow-limitations)
 - [Example Usage](#example-usage)
-- [Configuration Options for the Main Job](#configuration-options-for-the-main-job-nx-cloud-mainyml)
-- [Configuration Options for the Agent Jobs](#configuration-options-for-agent-jobs-nx-cloud-agentsyml)
+- [Adding read-write Nx Cloud access token to workflow](#adding-read-write-nx-cloud-access-token-to-workflow)
+- [Configuration Options for the Main Job (nx-cloud-main.yml)](#configuration-options-for-the-main-job-nx-cloud-mainyml)
+- [Configuration Options for Agent Jobs (nx-cloud-agents.yml)](#configuration-options-for-agent-jobs-nx-cloud-agentsyml)
 
 ## Disclaimer: Github Workflow Limitations
 
@@ -58,9 +60,12 @@ jobs:
     name: Nx Cloud - Main Job
     uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.9
     with:
+      # NOTE: Here we are using the special `nx-cloud record` command to ensure that any commands we run that do not go through the cloud task runner natively
+      # (i.e. anything that starts with `nx run`/`nx run-many`/`nx affected --target`), are still captured in the Nx Cloud UI and Github App comment for
+      # easier troubleshooting. See more here: https://nx.dev/nx-cloud/set-up/record-commands#recording-non-nx-commands
       parallel-commands: |
-        npx nx workspace-lint
-        npx nx format:check
+        npx nx-cloud record -- npx nx workspace-lint
+        npx nx-cloud record -- npx nx format:check
       parallel-commands-on-agents: |
         npx nx affected --target=lint --parallel=3
         npx nx affected --target=test --parallel=3 --ci --code-coverage
