@@ -150,11 +150,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-
 
+      - name: Get pnpm cache directory path
+        if: steps.package_manager.outputs.name == 'pnpm'
+        id: pnpm-cache-dir-path
+        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
       - name: Use the node_modules cache if available [pnpm]
         if: steps.package_manager.outputs.name == 'pnpm'
         uses: actions/cache@v3
         with:
-          path: ~/.pnpm-store
+          path: ${{ steps.pnpm-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-
