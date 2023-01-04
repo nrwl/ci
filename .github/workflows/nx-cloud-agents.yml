@@ -91,6 +91,7 @@ jobs:
           node-version: "${{ inputs.node-version }}"
           npm-version: "${{ inputs.npm-version }}"
           yarn-version: "${{ inputs.yarn-version }}"
+          package-json-path: "${{ inputs.working-directory || github.workspace }}/package.json"
 
       # Install pnpm with exact version provided by consumer or fallback to latest
       - name: Install PNPM
