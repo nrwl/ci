@@ -40,6 +40,12 @@ on:
       working-directory:
         required: false
         type: string
+      init-timeout-minutes:
+        required: false
+        type: number
+      agent-timeout-minutes:
+        required: false
+        type: number
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
@@ -52,6 +58,8 @@ jobs:
   set-agents:
     runs-on: ${{ inputs.runs-on }}
     name: Init
+    # GitHub's default timeout is 360 minutes
+    timeout-minutes: ${{ inputs.init-timeout-minutes || 360 }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -68,6 +76,8 @@ jobs:
     needs: set-agents
     runs-on: ${{ inputs.runs-on }}
     name: Agent ${{ matrix.agent }}
+    # GitHub's default timeout is 360 minutes
+    timeout-minutes: ${{ inputs.agent-timeout-minutes || 360 }}
     strategy:
       matrix:
         agent:
