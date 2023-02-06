@@ -112,7 +112,7 @@ jobs:
           if [[ $pnpm_ver != '' ]]; then echo "PNPM: $pnpm_ver"; fi
 
           echo "node_version=${node_ver:1}" >> $GITHUB_OUTPUT
-          echo "yarn_version=${yarn_ver:1}" >> $GITHUB_OUTPUT
+          echo "yarn_version=${yarn_ver}" >> $GITHUB_OUTPUT
 
       - name: Use the node_modules cache if available [npm]
         if: steps.package_manager.outputs.name == 'npm'
