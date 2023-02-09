@@ -64,7 +64,7 @@ on:
       working-directory:
         required: false
         type: string
-      timeout-minutes:
+      timeout:
         required: false
         type: number
 
@@ -83,7 +83,7 @@ jobs:
     # to that one after a forward slash, so we keep this one intentionally short to produce "Nx Cloud - Main Job / Run" in the Github UI
     name: Run
     # GitHub's default timeout is 360 minutes
-    timeout-minutes: ${{ inputs.timeout-minutes || 360 }}
+    timeout-minutes: ${{ inputs.timeout || 360 }}
     defaults:
       run:
         working-directory: ${{ inputs.working-directory || github.workspace }}
