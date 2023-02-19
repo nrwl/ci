@@ -1,0 +1,98 @@
+name: 'Install dependencies'
+description: 'Action to install the dependencies'
+inputs:
+  node-version:
+    description: NodeJs version
+    required: false
+  yarn-version:
+    description: Yarn version
+    required: false
+  npm-version:
+    description: NPM version
+    required: false
+  pnpm-version:
+    description: PNPM version
+    required: false
+  install-commands:
+    description: Install commands
+    required: false
+    default: ""
+  environment-variables:
+    description: Environment variables to set
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup package manager
+      id: package_manager
+      uses: ./.github/actions/package-manager
+      with:
+        node-version: ${{ inputs.node-version }}
+        yarn-version: ${{ inputs.yarn-version }}
+        npm-version: ${{ inputs.npm-version }}
+        pnpm-version: ${{ inputs.pnpm-version }}
+
+    - name: Process environment-variables
+      if: ${{ inputs.environment-variables != '' }}
+      uses: actions/github-script@v6
+      env:
+        ENV_VARS: ${{ inputs.environment-variables }}
+      with:
+        script: |
+          const { appendFileSync } = require('fs');
+          
+          // trim spaces and escape quotes
+          const cleanStr = str => str
+            .trim()
+            .replaceAll(/`/g, "\`");
+          
+          // parse variable to correct type
+          const parseStr = str =>
+            str === 'true' || str === 'TRUE'
+              ? true
+              : str === 'false' || str === 'FALSE'
+                ? false
+                : isNaN(str)
+                  ? str
+                  : parseFloat(str);
+          
+          const varsStr = process.env.ENV_VARS || '';
+          const vars = varsStr
+            .split('\n')
+            .map(variable => variable.trim())
+            .filter(variable => variable.indexOf('=') > 0)
+            .map(variable => ({
+              name: cleanStr(variable.split('=')[0]),
+              value: cleanStr(variable.slice(variable.indexOf('=') + 1))
+            }));
+          
+          for (const v of vars) {
+            console.log(`Appending environment variable \`${v.name}\` with value \`${v.value}\` to ${process.env.GITHUB_ENV}`);
+            appendFileSync(process.env.GITHUB_ENV, `${v.name}=${parseStr(v.value)}\n`);
+          }
+
+    - name: Run any configured install-commands
+      if: ${{ inputs.install-commands != '' }}
+      shell: bash
+      run: |
+        ${{ inputs.install-commands }}
+
+    - name: Install dependencies
+      if: ${{ inputs.install-commands == '' }}
+      shell: bash
+      run: |
+        if [ "${{ steps.package_manager.outputs.name == 'yarn' }}" == "true" ]; then
+          if [ "${{ startsWith(steps.versions.outputs.yarn_version, '1.') }}" == "true" ]; then
+            echo "Running yarn install --frozen-lockfile"
+            yarn install --frozen-lockfile
+          else
+            echo "Running yarn install --immutable"
+            yarn install --immutable
+          fi
+        elif [ "${{ steps.package_manager.outputs.name == 'pnpm' }}" == "true" ]; then
+          echo "Running pnpm install --frozen-lockfile"
+          pnpm install --frozen-lockfile
+        else
+          echo "Running npm ci"
+          npm ci
+        fi
