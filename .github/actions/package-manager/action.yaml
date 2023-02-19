@@ -18,10 +18,11 @@ outputs:
     description: 'the name of the package manager'
     value: ${{ steps.package_manager.outputs.name }}
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Detect package manager
       id: package_manager
+      shell: bash
       run: |
         echo "name=$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")" >> $GITHUB_OUTPUT
 
@@ -41,6 +42,7 @@ runs:
 
     - name: Print node/npm/yarn versions
       id: versions
+      shell: bash
       run: |
         node_ver=$( node --version )
         yarn_ver=$( yarn --version || true )
@@ -66,6 +68,7 @@ runs:
     - name: Get pnpm cache directory path
       if: steps.package_manager.outputs.name == 'pnpm'
       id: pnpm-cache-dir-path
+      shell: bash
       run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
     - name: Use the node_modules cache if available [pnpm]
@@ -80,6 +83,7 @@ runs:
     - name: Get yarn cache directory path [yarn 1.x]
       if: steps.package_manager.outputs.name == 'yarn' && startsWith(steps.versions.outputs.yarn_version, '1.')
       id: yarn-cache-dir-path
+      shell: bash
       run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
     - name: Use the node_modules cache if available [yarn 1.x]
@@ -94,6 +98,7 @@ runs:
     - name: Get yarn cache directory path [yarn berry]
       if: steps.package_manager.outputs.name == 'yarn' && !startsWith(steps.versions.outputs.yarn_version, '1.')
       id: yarn-berry-cache-dir-path
+      shell: bash
       run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
     - name: Use the node_modules cache if available [yarn berry]
