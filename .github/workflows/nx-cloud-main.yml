@@ -247,7 +247,6 @@ jobs:
         if: ${{ inputs.install-commands != '' }}
         run: |
           ${{ inputs.install-commands }}
-
       - name: Install dependencies
         if: ${{ inputs.install-commands == '' }}
         run: |
