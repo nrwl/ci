@@ -26,9 +26,9 @@ jobs:
         npx nx format:check
       parallel-commands-on-agents: |
         node -e "const f = require('fs'); if(f.existsSync('./install-commands-success')) console.log('install-commands success on agent.'); else { throw new Error('install commands did not run!');}"
-        npx nx affected --target=lint --parallel=3
-        npx nx affected --target=test --parallel=3 --ci --code-coverage
-        npx nx affected --target=build --parallel=3
+        npx node --max_old_space_size=8048 ./node_modules/.bin/nx affected --target=lint --parallel=3
+        npx node --max_old_space_size=8048 ./node_modules/.bin/nx affected --target=test --parallel=3 --ci --code-coverage
+        npx node --max_old_space_size=8048 ./node_modules/.bin/nx affected --target=build --parallel=3
 
   agents:
     name: Nx Cloud - Agents
