@@ -43,6 +43,12 @@ on:
       install-commands:
         required: false
         type: string
+      pre-install-commands:
+        required: false
+        type: string
+      post-install-commands:
+        required: false
+        type: string
       main-branch-name:
         required: false
         type: string
@@ -116,13 +122,6 @@ jobs:
         shell: bash
         run: |
           echo "name=$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")" >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        id: dist-cache
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-build-v3-${{ hashFiles('package-lock.json') }}
-          restore-keys: ${{ runner.os }}-build-v3-
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
       - uses: volta-cli/action@v4
         with:
@@ -244,14 +243,20 @@ jobs:
             }
 
       - name: Cache dependencies
-        id: cache
+        id: dist-cache
         uses: actions/cache@v3
         with:
           path: ./node_modules
           key: ${{ runner.os }}-build-v3-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-build-v3-
+      - name: Run any configured pre-install-commands
+        if: ${{ inputs.pre-install-commands != ''}}
+        run: |
+          ${{ inputs.pre-install-commands }}
+      - name: console dist-cache
+        run: echo ${{steps.dist-cache.outputs.cache-hit}}
       - name: Run any configured install-commands
-        if: ${{ inputs.install-commands != '' && steps.cache.outputs.cache-hit != 'true' }}
+        if: ${{ inputs.install-commands != '' && steps.dist-cache.outputs.cache-hit != 'true' }}
         run: |
           ${{ inputs.install-commands }}
       - name: Install dependencies
@@ -272,7 +277,10 @@ jobs:
             echo "Running npm ci"
             npm ci
           fi
-
+      - name: Run any configured post-install-commands
+        if: ${{ inputs.post-install-commands != ''}}
+        run: |
+          ${{ inputs.post-install-commands }}
       # An unfortunate side-effect of the way reusable workflows work is that by the time they are pulled into the "caller"
       # repo, they are effectively completely embedded in that context. This means that we cannot reference any files which
       # are local to this repo which defines the workflow, and we therefore need to work around this by embedding the contents

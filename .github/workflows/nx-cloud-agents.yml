@@ -31,6 +31,12 @@ on:
       install-commands:
         required: false
         type: string
+      pre-install-commands:
+        required: false
+        type: string
+      post-install-commands:
+        required: false
+        type: string
       runs-on:
         required: false
         type: string
@@ -213,14 +219,20 @@ jobs:
               appendFileSync(process.env.GITHUB_ENV, `${v.name}=${parseStr(v.value)}\n`);
             }
       - name: Cache dependencies
-        id: cache
+        id: dist-cache
         uses: actions/cache@v3
         with:
           path: ./node_modules
           key: ${{ runner.os }}-build-v3-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-build-v3-
+      - name: Run any configured pre-install-commands
+        if: ${{ inputs.pre-install-commands != ''}}
+        run: |
+          ${{ inputs.pre-install-commands }}
+      - name: console dist-cache
+        run: echo ${{steps.dist-cache.outputs.cache-hit}}
       - name: Run any configured install-commands
-        if: ${{ inputs.install-commands != '' }}
+        if: ${{ inputs.install-commands != '' && steps.dist-cache.outputs.cache-hit != 'true' }}
         run: |
           ${{ inputs.install-commands }}
 
@@ -242,7 +254,10 @@ jobs:
             echo "Running npm ci"
             npm ci
           fi
-
+      - name: Run any configured post-install-commands
+        if: ${{ inputs.post-install-commands != ''}}
+        run: |
+          ${{ inputs.post-install-commands }}
       - name: Start Nx Agent ${{ matrix.agent }}
         run: npx nx-cloud start-agent
         env:
