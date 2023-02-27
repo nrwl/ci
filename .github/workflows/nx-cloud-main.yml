@@ -237,8 +237,15 @@ jobs:
               appendFileSync(process.env.GITHUB_ENV, `${v.name}=${parseStr(v.value)}\n`);
             }
 
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-v3-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-build-v3-
       - name: Run any configured install-commands
-        if: ${{ inputs.install-commands != '' }}
+        if: ${{ inputs.install-commands != '' && steps.cache.outputs.cache-hit != 'true' }}
         run: |
           ${{ inputs.install-commands }}
       - name: Install dependencies
