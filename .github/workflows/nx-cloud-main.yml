@@ -275,6 +275,14 @@ jobs:
         if: ${{ inputs.post-install-commands != ''}}
         run: |
           ${{ inputs.post-install-commands }}
+      - name: Run affected matrix
+        id: affected
+        run: |
+          AFFECTED=$(node ./node_modules/.bin/nx print-affected --target=build --select=tasks.target.project)
+          echo $AFFECTED
+          echo "matrix=$AFFECTED" >> $GITHUB_OUTPUT
+          
+
       # An unfortunate side-effect of the way reusable workflows work is that by the time they are pulled into the "caller"
       # repo, they are effectively completely embedded in that context. This means that we cannot reference any files which
       # are local to this repo which defines the workflow, and we therefore need to work around this by embedding the contents
