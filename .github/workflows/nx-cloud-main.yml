@@ -73,6 +73,11 @@ on:
       timeout:
         required: false
         type: number
+    outputs:
+      affected:
+        description: "Affected matrix"
+        value: ${{ jobs.main.outputs.affected }}
+
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
