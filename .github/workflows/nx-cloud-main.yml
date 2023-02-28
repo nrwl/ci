@@ -70,6 +70,11 @@ on:
       working-directory:
         required: false
         type: string
+    outputs:
+      affected:
+        description: "Affected matrix"
+        value: ${{ jobs.main.outputs.affected }}
+
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
