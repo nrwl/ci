@@ -326,7 +326,7 @@ jobs:
         run: chmod +x ${GITHUB_WORKSPACE//\\//}/.github/workflows/run-commands-in-parallel.sh
 
       - name: Initialize the Nx Cloud distributed CI run
-        run: npx nx-cloud start-ci-run --stop-agents-on-failure=false
+        run: npx nx-cloud start-ci-run
 
       # The good thing about the multi-line string input for sequential commands is that we can simply forward it on as is to the bash shell and it will behave
       # how we want it to in terms of quote escaping, variable assignment etc
