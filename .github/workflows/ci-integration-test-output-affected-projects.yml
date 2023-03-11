@@ -1,0 +1,32 @@
+name: CI - integration test output-affected-projects
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    name: Nx Cloud - Main Job
+    uses: ./.github/workflows/nx-cloud-main.yml
+    with:
+      working-directory: ./integration-tests/npm
+      init-commands: |
+        npx nx-cloud start-ci-run --stop-agents-after="build" --agent-count=3
+      parallel-commands-on-agents: |
+        npx nx affected --target=lint --parallel=3
+        npx nx affected --target=test --parallel=3 --ci --code-coverage
+        npx nx affected --target=build --parallel=3
+      output-affected-projects : true
+
+  agents:
+    name: Nx Cloud - Agents
+    uses: ./.github/workflows/nx-cloud-agents.yml
+    with:
+      working-directory: ./integration-tests/npm
+      number-of-agents: 1
