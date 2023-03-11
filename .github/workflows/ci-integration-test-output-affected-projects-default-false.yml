@@ -1,0 +1,35 @@
+name: CI - integration test output-affected-projects
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    name: Nx Cloud - Main Job
+    uses: ./.github/workflows/nx-cloud-main.yml
+    with:
+      working-directory: ./integration-tests/npm
+      parallel-commands-on-agents: |
+        npx nx run react-app:build
+
+  agents:
+    name: Nx Cloud - Agents
+    uses: ./.github/workflows/nx-cloud-agents.yml
+    with:
+      working-directory: ./integration-tests/npm
+      number-of-agents: 1
+
+  check-affectedProjects-output:
+    needs: main
+    runs-on: ubuntu-latest
+    steps:    
+      - name: Expect output to be empty if output-affected-projects not set to true
+        if: ${{ needs.main.outputs.affectedProjects != '' }} 
+        run: node -e throw new Error('affectedProjects out put was not empty as expected')

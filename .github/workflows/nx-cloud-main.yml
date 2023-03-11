@@ -2,6 +2,10 @@ name: Nx Cloud Main
 
 on:
   workflow_call:
+    outputs:
+      affectedProjects:
+        description: "list of affeced projects"
+        value: ${{ jobs.main.outputs.affectedProjects }}
     secrets:
       NPM_TOKEN:
         required: false
@@ -59,6 +63,10 @@ on:
         required: false
         type: string
         default: "nx-main-artifacts"
+      output-affected-projects:
+        required: false
+        type: boolean
+        default: false
       # We needed this input in order to be able to configure out integration tests for this repo, it is not documented
       # so as to not cause confusion/add noise, but technically any consumer of the workflow can use it if they want to.
       working-directory:
@@ -75,6 +83,8 @@ env:
 
 jobs:
   main:
+    outputs:
+      affectedProjects: ${{steps.outputAffectedProjects.outputs.affectedProjects}}
     runs-on: ${{ inputs.runs-on }}
     # The name of the job which will invoke this one is expected to be "Nx Cloud - Main Job", and whatever we call this will be appended
     # to that one after a forward slash, so we keep this one intentionally short to produce "Nx Cloud - Main Job / Run" in the Github UI
@@ -344,8 +354,16 @@ jobs:
         # We need to escape the workspace path to be consistent cross-platform: https://github.com/actions/runner/issues/1066
         run: ${GITHUB_WORKSPACE//\\//}/.github/workflows/run-commands-in-parallel.sh '${{ steps.parallel_commands_config.outputs.result }}'
 
+      - name: outputAffectedProjects
+        if: ${{ inputs.output-affected-projects == true}}
+        id: outputAffectedProjects
+        run: |
+          affectedProjects=$(npx nx print-affected --select=projects)
+          echo affectedProjects $affectedProjects
+          echo "affectedProjects=$affectedProjects" >> $GITHUB_OUTPUT
+
       # The good thing about the multi-line string input for sequential commands is that we can simply forward it on as is to the bash shell and it will behave
-      # how we want it to in terms of quote escaping, variable assignment etc
+      # how we want it to in terms of quote escaping, variable assignment etc     
       - name: Run any configured final-commands sequentially
         if: ${{ inputs.final-commands != '' }}
         run: |
@@ -362,3 +380,4 @@ jobs:
         with:
           name: ${{ inputs.artifacts-name }}
           path: ${{ inputs.artifacts-path }}
+          

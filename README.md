@@ -240,6 +240,10 @@ See the annotated configuration below for all explicitly supported secret values
     # NOTE: This input only has an effect if used with the `artifacts-path` input.
     # Default: "nx-main-artifacts"
     artifacts-name: ""
+    # [OPTIONAL] Output a list of affected projects
+    # If set to true, a list of affected projects will be outputed. The output can be accessed in subsequent pipeline jobs (using variable ${{needs.main.outputs.affectedProjects}}). See .github/workflows/ci-integration-test-output-affected-projects-true.yml for example.
+    # Default: false
+    output-affected-projects: ""
 ```
 
 <!-- end configuration-options-for-the-main-job -->
