@@ -40,6 +40,9 @@ on:
       working-directory:
         required: false
         type: string
+      timeout-minutes:
+        required: false
+        type: number
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
@@ -51,6 +54,7 @@ env:
 jobs:
   set-agents:
     runs-on: ${{ inputs.runs-on }}
+    timeout-minutes: ${{ inputs.timeout-minutes || 60 }}
     name: Init
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -67,6 +71,7 @@ jobs:
   Run:
     needs: set-agents
     runs-on: ${{ inputs.runs-on }}
+    timeout-minutes: ${{ inputs.timeout-minutes || 60 }}
     name: Agent ${{ matrix.agent }}
     strategy:
       matrix:
