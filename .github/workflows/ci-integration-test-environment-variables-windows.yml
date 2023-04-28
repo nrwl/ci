@@ -41,7 +41,7 @@ jobs:
         node -e "if(process.env.CAPITAL_BOOLEAN == 'false') console.log('Capital boolean parsing on agent successful'); else { throw new Error('Capital boolean parsing on agent failed!');}"
         node -e "if(process.env.OTHER_TEXT == 'some other \\"text\\"') console.log('Text parsing on agent successful'); else { throw new Error('Text parsing on agent failed!');}"
         node -e "if(process.env.NPM_TOKEN == 'SOME_NOT_SO_SECRET_VALUE') console.log('NPM_TOKEN secret parsing successful'); else { throw new Error('NPM_TOKEN secret parsing failed!');}"
-        
+
   agents:
     name: Nx Cloud - Agents
     uses: ./.github/workflows/nx-cloud-agents.yml
