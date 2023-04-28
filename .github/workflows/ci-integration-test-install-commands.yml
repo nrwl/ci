@@ -23,7 +23,6 @@ jobs:
         echo "install commands end"
       parallel-commands: |
         node -e "const f = require('fs'); if(f.existsSync('./install-commands-success')) console.log('install-commands success'); else { throw new Error('install commands did not run!');}"
-        npx nx workspace-lint
         npx nx format:check
       parallel-commands-on-agents: |
         node -e "const f = require('fs'); if(f.existsSync('./install-commands-success')) console.log('install-commands success on agent.'); else { throw new Error('install commands did not run!');}"

@@ -17,7 +17,6 @@ jobs:
     with:
       working-directory: ./integration-tests/yarn-berry
       parallel-commands: |
-        yarn nx workspace-lint
         yarn nx format:check
       parallel-commands-on-agents: |
         yarn nx affected --target=lint --parallel=3
