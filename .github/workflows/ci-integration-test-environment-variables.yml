@@ -16,7 +16,6 @@ jobs:
     uses: ./.github/workflows/nx-cloud-main.yml
     secrets:
       # We provide a fallback value here because we have no way to share the secrets namespace with contributor forks
-      GITHUB_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST || 'NOT_A_SECRET_VALUE' }}
       NPM_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST || 'SOME_NOT_SO_SECRET_VALUE' }}
       # NOTE: We cannot include these secrets in the integration tests otherwise they will interfere with the real connection to Nx Cloud
       # NX_CLOUD_ACCESS_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST }}
