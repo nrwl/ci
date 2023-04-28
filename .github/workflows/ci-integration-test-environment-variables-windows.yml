@@ -16,11 +16,11 @@ jobs:
     uses: ./.github/workflows/nx-cloud-main.yml
     secrets:
       # We provide a fallback value here because we have no way to share the secrets namespace with contributor forks
-      GITHUB_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST || 'NOT_A_SECRET_VALUE' }}
       NPM_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST || 'SOME_NOT_SO_SECRET_VALUE' }}
       # NOTE: We cannot include these secrets in the integration tests otherwise they will interfere with the real connection to Nx Cloud
       # NX_CLOUD_ACCESS_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST }}
       # NX_CLOUD_AUTH_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST }}
+      # GITHUB_TOKEN: ${{ secrets.SECRET_FOR_INTEGRATION_TEST }}
     with:
       runs-on: windows-latest
       working-directory: ./integration-tests/npm
@@ -41,8 +41,7 @@ jobs:
         node -e "if(process.env.CAPITAL_BOOLEAN == 'false') console.log('Capital boolean parsing on agent successful'); else { throw new Error('Capital boolean parsing on agent failed!');}"
         node -e "if(process.env.OTHER_TEXT == 'some other \\"text\\"') console.log('Text parsing on agent successful'); else { throw new Error('Text parsing on agent failed!');}"
         node -e "if(process.env.NPM_TOKEN == 'SOME_NOT_SO_SECRET_VALUE') console.log('NPM_TOKEN secret parsing successful'); else { throw new Error('NPM_TOKEN secret parsing failed!');}"
-        node -e "if(process.env.GITHUB_TOKEN == 'NOT_A_SECRET_VALUE') console.log('GITHUB_TOKEN secret parsing successful'); else { throw new Error('GITHUB_TOKEN secret parsing failed!');}"
-
+        
   agents:
     name: Nx Cloud - Agents
     uses: ./.github/workflows/nx-cloud-agents.yml
