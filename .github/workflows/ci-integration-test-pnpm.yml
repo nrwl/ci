@@ -16,6 +16,8 @@ jobs:
     uses: ./.github/workflows/nx-cloud-main.yml
     with:
       working-directory: ./integration-tests/pnpm
+      pnpm-version: 8.3.0
+      number-of-agents: 3
       parallel-commands: |
         npx nx format:check
       parallel-commands-on-agents: |

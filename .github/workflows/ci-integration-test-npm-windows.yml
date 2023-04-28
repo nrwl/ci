@@ -17,6 +17,7 @@ jobs:
     with:
       runs-on: windows-latest
       working-directory: ./integration-tests/npm
+      number-of-agents: 3
       parallel-commands: |
         npx nx format:check
       parallel-commands-on-agents: |
