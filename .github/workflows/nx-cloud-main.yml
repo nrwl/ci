@@ -291,7 +291,7 @@ jobs:
       - name: Run affected matrix
         id: affected
         run: |
-          AFFECTED=$(node ./node_modules/.bin/nx print-affected --target=build --select=tasks.target.project)
+          AFFECTED=$(npx nx print-affected --target=build --select=tasks.target.project)
           echo $AFFECTED
           echo "matrix=$AFFECTED" >> $GITHUB_OUTPUT
           
