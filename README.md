@@ -245,6 +245,10 @@ See the annotated configuration below for all explicitly supported secret values
     # NOTE: Timeout should be expressed in minutes
     # Default: 360
     timeout: ""
+
+    # [OPTIONAL] Provides override for repo's working directory
+    # Useful if root git repo contains multiple monorepos
+    working-directory: ""
 ```
 
 <!-- end configuration-options-for-the-main-job -->
@@ -312,6 +316,10 @@ See the annotated configuration below for all explicitly supported secret values
     # NOTE: Timeout should be expressed in minutes
     # Default: 360
     timeout: ""
+
+    # [OPTIONAL] Provides override for repo's working directory
+    # Useful if root git repo contains multiple monorepos
+    working-directory: ""
 ```
 
 <!-- end configuration-options-for-agent-jobs -->
