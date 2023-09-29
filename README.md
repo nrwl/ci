@@ -239,6 +239,12 @@ See the annotated configuration below for all explicitly supported secret values
     # NOTE: This input only has an effect if used with the `artifacts-path` input.
     # Default: "nx-main-artifacts"
     artifacts-name: ""
+
+    # [OPTIONAL] The number of days artifacts will be retained.
+    #
+    # NOTE: This input only has an effect if used with the `artifacts-path` input.
+    # Default: 90
+    artifacts-retention-days: ""
     
     # [OPTIONAL] If you want to override GitHub's default timeout provide a timeout expressed in minutes.
     #
