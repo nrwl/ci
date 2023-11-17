@@ -60,7 +60,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.13.0
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.14.0
     with:
       # NOTE: Here we are using the special `nx-cloud record` command to ensure that any commands we run that do not go through the cloud task runner natively
       # (i.e. anything that starts with `nx run`/`nx run-many`/`nx affected --target`), are still captured in the Nx Cloud UI and Github App comment for
@@ -74,7 +74,7 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.13.0
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.14.0
     with:
       number-of-agents: 3
 ```
@@ -109,7 +109,7 @@ concurrency:
 jobs:
   main:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.13.0
+    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.14.0
     secrets:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
@@ -117,7 +117,7 @@ jobs:
 
   agents:
     name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.13.0
+    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.14.0
     secrets:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
       NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
@@ -133,7 +133,7 @@ See the annotated configuration below for all explicitly supported secret values
 <!-- start configuration-options-for-the-main-job -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.13.0
+- uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.14.0
   # [OPTIONAL] Explicitly supported secret values which can be passed into the workflow from your outer workflow run.
   #
   # NOTE: You cannot access values from ${{ secrets }} beyond what is explicitly specified here because of the limitations of reusable Github workflows
@@ -264,7 +264,7 @@ See the annotated configuration below for all explicitly supported secret values
 <!-- start configuration-options-for-agent-jobs -->
 
 ```yaml
-- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.13.0
+- uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.14.0
   # [OPTIONAL] Explicitly supported secret values which can be passed into the workflow from your outer workflow run.
   #
   # NOTE: You cannot access values from ${{ secrets }} beyond what is explicitly specified here because of the limitations of reusable Github workflows
