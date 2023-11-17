@@ -59,6 +59,10 @@ on:
         required: false
         type: string
         default: "nx-main-artifacts"
+      artifacts-retention-days:
+        required: false
+        type: number
+        default: 90
       working-directory:
         required: false
         type: string
@@ -367,3 +371,4 @@ jobs:
         with:
           name: ${{ inputs.artifacts-name }}
           path: ${{ inputs.artifacts-path }}
+          retention-days: ${{ inputs.artifacts-retention-days }}
