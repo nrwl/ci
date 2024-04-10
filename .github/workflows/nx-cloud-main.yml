@@ -120,7 +120,7 @@ jobs:
           echo "name=$([[ -f ./yarn.lock ]] && echo "yarn" || ([[ -f ./pnpm-lock.yaml ]] && echo "pnpm") || echo "npm")" >> $GITHUB_OUTPUT
 
       # Set node/npm/yarn versions using volta, with optional overrides provided by the consumer
-      - uses: volta-cli/action@master
+      - uses: volta-cli/action@v4
         with:
           node-version: "${{ inputs.node-version }}"
           npm-version: "${{ inputs.npm-version }}"
