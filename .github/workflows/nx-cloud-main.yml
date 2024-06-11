@@ -92,7 +92,7 @@ jobs:
         # Specify shell to help normalize across different operating systems
         shell: bash
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout [Pull Request]
         if: ${{ github.event_name == 'pull_request' }}
         with:
@@ -101,7 +101,7 @@ jobs:
           # We need to fetch all branches and commits so that Nx affected has a base to compare against.
           fetch-depth: 0
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout [Default Branch]
         if: ${{ github.event_name != 'pull_request' }}
         with:
@@ -109,7 +109,7 @@ jobs:
           fetch-depth: 0
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
+        uses: nrwl/nx-set-shas@v4
         with:
           main-branch-name: ${{ inputs.main-branch-name }}
 
@@ -130,7 +130,7 @@ jobs:
       # Install pnpm with exact version provided by consumer or fallback to latest
       - name: Install PNPM
         if: steps.package_manager.outputs.name == 'pnpm'
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
         with:
           version: ${{ inputs.pnpm-version }}
           package_json_file: "${{ inputs.working-directory && format('{0}/package.json', inputs.working-directory) || 'package.json' }}"
@@ -152,7 +152,7 @@ jobs:
 
       - name: Use the node_modules cache if available [npm]
         if: steps.package_manager.outputs.name == 'npm'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
@@ -166,7 +166,7 @@ jobs:
 
       - name: Use the node_modules cache if available [pnpm]
         if: steps.package_manager.outputs.name == 'pnpm'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -180,7 +180,7 @@ jobs:
 
       - name: Use the node_modules cache if available [yarn 1.x]
         if: steps.package_manager.outputs.name == 'yarn' && startsWith(steps.versions.outputs.yarn_version, '1.')
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -194,7 +194,7 @@ jobs:
 
       - name: Use the node_modules cache if available [yarn berry]
         if: steps.package_manager.outputs.name == 'yarn' && !startsWith(steps.versions.outputs.yarn_version, '1.')
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.yarn-berry-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-yarn-berry-${{ hashFiles('**/yarn.lock') }}
@@ -203,7 +203,7 @@ jobs:
 
       - name: Process environment-variables
         if: ${{ inputs.environment-variables != '' }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           ENV_VARS: ${{ inputs.environment-variables }}
         with:
@@ -269,7 +269,7 @@ jobs:
       # are local to this repo which defines the workflow, and we therefore need to work around this by embedding the contents
       # of the shell utilities for executing commands into the workflow directly.
       - name: Create command utils
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const { writeFileSync } = require('fs');
@@ -310,7 +310,7 @@ jobs:
           ${{ inputs.init-commands }}
 
       - name: Process parallel commands configuration
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: parallel_commands_config
         env:
           PARALLEL_COMMANDS: ${{ inputs.parallel-commands }}
@@ -366,7 +366,7 @@ jobs:
           ${{ inputs.final-commands }}
 
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ inputs.artifacts-path != '' }}
         with:
           name: ${{ inputs.artifacts-name }}

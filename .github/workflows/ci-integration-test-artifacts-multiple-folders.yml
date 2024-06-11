@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Downloading artifacts"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: custom-artifacts-name
       - run: node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
