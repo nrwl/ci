@@ -39,4 +39,4 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: custom-artifacts-name
-      - run: node -e "if(fs.existsSync('dist/apps/react-app') && fs.existsSync('coverage/apps/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
+      - run: node -e "if(fs.existsSync('dist/react-app') && fs.existsSync('coverage/react-app')) console.log('Artifacts are here...'); else { throw new Error('Artifacts do not exist!');}"
