@@ -165,7 +165,7 @@ See the annotated configuration below for all explicitly supported secret values
       ""
 
     # [OPTIONAL] A multi-line string representing any bash commands (separated by new lines) which should
-    # run in parallel, directly on the main job at the same time as any commands which may have beeen
+    # run in parallel, directly on the main job at the same time as any commands which may have been
     # specified via parallel-commands-on-agents
     #
     # NOTE: Due to how each stringified command gets interpreted in order to parallelize it, there may be
